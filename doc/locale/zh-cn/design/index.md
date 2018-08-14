@@ -7,3 +7,5 @@
 
 - [舞台、页面、对象树设计](./ref/object-tree.md)
 - [时间轴设计](./ref/time-axis.md)
+- [事件机制](./ref/event.md)
+- [求值器](./ref/evaluator.md)
