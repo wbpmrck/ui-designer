@@ -9,3 +9,4 @@
 - [时间轴设计](./ref/time-axis.md)
 - [事件机制](./ref/event.md)
 - [求值器](./ref/evaluator.md)
+- [布局设计](./ref/layout.md)
