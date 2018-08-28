@@ -6,7 +6,7 @@
 
 ui-designer 也参考这种设计，具体效果参考如图(来自iH5):
 
-![time-axis](./time-axis.png)
+![time-axis](./res/time-axis.png)
 
 ## 概念
 

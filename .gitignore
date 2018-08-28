@@ -1,3 +1,5 @@
 .idea/
 node_modules/
 doc/old/
+dist/
+/doc/old

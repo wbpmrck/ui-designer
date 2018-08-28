@@ -4,7 +4,7 @@
 
 ui-designer 也参考这种设计，具体效果参考如图(来自iH5):
 
-![object tree](./object-tree.png)
+![object tree](./res/object-tree.png)
 
 ## 概念
 

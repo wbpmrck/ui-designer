@@ -6,7 +6,7 @@
 
 这个概念，我是在设计 `ui-designer` 时总结出来的，其灵感来源于iH5,如下图(来自iH5):
 
-![evaluator-1](./evaluator-1.png)
+![evaluator-1](./res/evaluator-1.png)
 
 ## 思路梳理
 

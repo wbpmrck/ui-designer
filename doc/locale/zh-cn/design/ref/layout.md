@@ -11,7 +11,7 @@ ui-designer 中，元素的布局是一个非常关键的方面。如何设计�
 
 `ui-designer`采用标准的W3C盒子模型：
 
-![盒子模型](./box-sizing.png)
+![盒子模型](./res/box-sizing.png)
 
 ## 概念
 

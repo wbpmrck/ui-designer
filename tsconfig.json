@@ -1,10 +1,11 @@
 {
     "compilerOptions": {
-        "module": "system",
+        "outDir": "./dist2/",
         "noImplicitAny": true,
-        "removeComments": true,
-        "preserveConstEnums": true,
-        "outFile": "./bin/ud.js",
+        "module": "es6",
+        "target": "es5",
+        "jsx": "react",
+        "allowJs": true,
         "sourceMap": true
     },
     "include": [
