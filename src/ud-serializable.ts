@@ -5,9 +5,9 @@
  */
 abstract class UDSerializable {
     
-    constructor(seriallizedString?: string) {
-        if(seriallizedString!==undefined && seriallizedString!==null && seriallizedString.length>0){
-            this.deserialize(seriallizedString)
+    constructor(serializedString?: string) {
+        if(serializedString!==undefined && serializedString!==null && serializedString.length>0){
+            this.deserialize(serializedString)
         }
         
     }
@@ -16,13 +16,13 @@ abstract class UDSerializable {
      * 对自身进行序列化
      * @param options ：可选参数，用于控制序列化的行为
      */
-    abstract serialize(options ?:any) : string 
+    abstract serialize(options ?:any) : string |undefined
 
     /**
      * 接收输入的序列化字符串，进行反序列化，并设置到自身属性中
-     * @param seriallizedString 
+     * @param serializedString 
      */
-    abstract deserialize(seriallizedString: string) : void 
+    abstract deserialize(serializedString: string) : void 
 }
 
 export default UDSerializable

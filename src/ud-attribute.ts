@@ -17,36 +17,40 @@ enum UDAttributeType {
 //     Angle="°",
 // }
 type UDAttributeUnit = "px"|"percentage"|"angle"|"none"
+var UDAttributeUnitEnum:{[key:string]:UDAttributeUnit}={
+    px:"px",
+    percentage:"percentage",
+    angle:"angle",
+    none:"none",
+}
 
 /**
  * 表示一个属性值
  */
-class UDAttribute<T> extends UDSerializable{
+class UDAttribute extends UDSerializable{
 
     /**
      * 这里面的T应该都是简单类型，不要用属性去尝试保存一个对象
      */
-    props:{
-        name : string
-        value : T|undefined
-        unit : UDAttributeUnit|undefined
-        defaultValue : T
-    }
+    name : string
+    value : any
+    unit : UDAttributeUnit|undefined
+    defaultUnit : UDAttributeUnit|undefined
+    defaultValue : any
 
-    constructor({name,value,unit,defaultValue,serializedString}:{name?:string,value?:T,unit ?: UDAttributeUnit,defaultValue : T,serializedString?:string}){
+    constructor({name,value,unit,defaultValue,defaultUnit,serializedString}:{name?:string,value?:any,unit ?: UDAttributeUnit,defaultValue ?: any,defaultUnit ?: UDAttributeUnit|undefined,serializedString?:string}){
         super(serializedString);
 
         //如果不是反序列化方式创建对象，则赋值默认值
-        if(this.props===undefined){
-            this.props={
-                name:name,
-                value:value,
-                unit:unit,
-                defaultValue:defaultValue
-            }
-        }else{
-            this.props.defaultValue = defaultValue
+        if(serializedString===undefined){
+            this.name=name;
+            this.value=value;
+            this.unit=unit;
+            this.defaultValue = defaultValue
+            this.defaultUnit = defaultUnit
         }
+        
+
     }
 
     // constructor({name,value,unit,defaultValue,serializedString}:{name:string,value:T,unit : UDAttributeUnit|undefined,defaultValue : T,serializedString?:string}){
@@ -67,17 +71,18 @@ class UDAttribute<T> extends UDSerializable{
      * 对自身进行序列化
      * @param options ：可选参数，用于控制序列化的行为
      */
-    serialize(options ?:any) : string{
+    serialize(options ?:any) : string|undefined{
         try{
             //如果自己当前的值等于默认值,则自己序列化输出无结果
-            if(this.props.defaultValue===this.props.value){
-                return ""
+            if(this.defaultValue===this.value && this.defaultUnit === this.unit){
+                return undefined
             }else{
-                return JSON.stringify({name:this.props.name,value:this.props.value,unit:this.props.unit})
+                // return JSON.stringify({name:this.name,value:this.value,unit:this.unit,defaultValue:this.defaultValue,defaultUnit:this.defaultUnit})
+                return JSON.stringify({name:this.name,value:this.value,unit:this.unit})
             }
         }catch(e){
             console.error(e);
-            return ""
+            return undefined
         }
     }   
     /**
@@ -88,12 +93,12 @@ class UDAttribute<T> extends UDSerializable{
         if(seriallizedString !== undefined){
             try{
                 let dataJson = JSON.parse(seriallizedString);
-                this.props= {
-                    name : dataJson.name,
-                    value : dataJson.value,
-                    unit : dataJson.unit,
-                    defaultValue:undefined
-                }
+                this.name = dataJson.name;
+                this.value = dataJson.value;
+                this.unit = dataJson.unit;
+                // this.defaultValue = dataJson.defaultValue;
+                // this.defaultUnit = dataJson.defaultUnit;
+                
             }catch(e){
                 console.error(e);
             }
@@ -102,4 +107,5 @@ class UDAttribute<T> extends UDSerializable{
 
 }
 
-export {UDAttribute,UDAttributeUnit}
+
+export {UDAttribute,UDAttributeUnit,UDAttributeUnitEnum}
