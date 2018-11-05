@@ -9,6 +9,7 @@
 - [时间轴设计](./ref/time-axis.md)
 - [事件机制](./ref/event.md)
 - [求值器](./ref/evaluator.md)
+- [交互手势](./ref/gesture.md)
 - [布局设计](./ref/layout.md)
 - [层的概念(未完成)](./ref/layer.md)
 - [容器的概念(未完成)](./ref/container.md)
