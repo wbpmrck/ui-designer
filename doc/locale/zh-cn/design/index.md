@@ -10,6 +10,7 @@
 - [事件机制](./ref/event.md)
 - [求值器](./ref/evaluator.md)
 - [交互手势](./ref/gesture.md)
+- [页面场景生命周期](./ref/page-lifecycle.md)
 - [布局设计](./ref/layout.md)
 - [层的概念(未完成)](./ref/layer.md)
 - [容器的概念(未完成)](./ref/container.md)
