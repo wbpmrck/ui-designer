@@ -18,3 +18,9 @@
 ### Frozen
 
 ### Discarded
+
+## 补充
+
+### Direction Change
+
+当设备方向变化的时候，需要通知到page
