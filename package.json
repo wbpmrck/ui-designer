@@ -8,8 +8,9 @@
     "lib": "lib"
   },
   "scripts": {
-    "build": "webpack  --progress --hide-modules --config build/webpack.config.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "webpack  --progress --watch --hide-modules --config build/webpack.config.dev.js",
+    "build": "webpack  --progress --hide-modules --config build/webpack.config.build.js",
+    "test": "mocha --recursive --full-trace ./test/**/*.js "
   },
   "repository": {
     "type": "git",
@@ -26,9 +27,17 @@
   },
   "homepage": "https://github.com/wbpmrck/ui-designer#readme",
   "devDependencies": {
-    "ts-loader": "^4.5.0",
-    "typescript": "^3.0.1",
-    "webpack": "^4.17.0",
-    "webpack-cli": "^3.1.0"
+    "@babel/core": "^7.1.2",
+    "@babel/plugin-proposal-class-properties": "^7.1.0",
+    "@babel/plugin-transform-runtime": "^7.1.0",
+    "@babel/preset-env": "^7.1.0",
+    "@babel/runtime": "^7.1.2",
+    "babel-loader": "^8.0.4",
+    "chai": "^4.2.0",
+    "mocha": "^5.2.0",
+    "sinon": "^7.1.0",
+    "webpack": "^4.23.1",
+    "webpack-cli": "^3.1.0",
+    "webpack-merge": "^4.1.4"
   }
 }

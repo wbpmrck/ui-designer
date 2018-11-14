@@ -1,25 +1,26 @@
-import UDSerializable from "./ud-serializable"
 import {UDAttribute,UDAttributeUnit} from "./ud-attribute"
 import {regClass,createClassObject} from "./ud-runtime"
-class UDObject extends UDSerializable {
+class UDObject {
     static identitySeed = 1;
-    private _identity: string //自动化生成的唯一标识
-    public id:string //允许外部指定的唯一标识
-    public typeName: string //类型名称
-    public parent?: UDObject //节点的父亲节点
-    public children: Array<UDObject>  //节点的孩子
-    public attributes : { [key: string]: UDAttribute }
+    _identity; //自动化生成的唯一标识
+    id;//允许外部指定的唯一标识
+    // typeName; //类型名称
+    parent; //节点的父亲节点
+    children;  //节点的孩子
+    attributes;
 
 
-    constructor({typeName,serializedString}:{typeName: string,serializedString?: string}) {
-        super(serializedString);
+    // constructor({typeName,serializedString}) {
+    constructor({serializedString}) {
         // 如果不是通过反序列化创建对象，则开始正常构造对象
-        if(serializedString===undefined){
-            this.typeName = typeName;
+        if(serializedString!==undefined && serializedString!==null && serializedString.length>0){
+            this.deserialize(serializedString)
+        }else{
+            // this.typeName = typeName;
             this._identity = `${+new Date()}-${UDObject.identitySeed++}`;
             this.parent = undefined;
             this.attributes = {};
-            this.children = new Array<UDObject>();
+            this.children = [];
         }
     }
 
@@ -28,26 +29,34 @@ class UDObject extends UDSerializable {
      * 对自身进行序列化
      * @param options ：可选参数，用于控制序列化的行为
      */
-    serialize(options ?:any) : string{
+    serialize(options){
         try{
-            // //如果自己当前的值等于默认值,则自己序列化输出无结果
-            // if(this.props.defaultValue===this.props.value){
-            //     return ""
-            // }else{
-            //     return JSON.stringify({name:this.props.name,value:this.props.value,unit:this.props.unit})
-            // }
-
+           
             /*
                 注意：
                 1.序列化的时候，父节点无需序列化。因为在反序列化的时候，一定是从父亲开始反序列化，这时候我们希望子节点指向的是父节点的引用。所以是由父节点
                 调用addChild来更新此字段的
 
             */
+            // let json = `{
+            //     "_identity":"${this._identity}",
+            //     "id":"${this.id}",
+            //     "typeName":"${this.typeName}",
+            //     "attributes":[${this.findAttribute((attr)=>{
+            //         return attr.value!==attr.defaultValue || attr.unit!==attr.defaultUnit
+            //     }).map((attr)=>{
+            //         return attr.serialize(options)
+            //     }).join(",")}],
+            //     "children":[${this.children.map((child)=>{
+            //         return child.serialize(options)
+            //     }).join(",")}]
+            // }`;
+
             let json = `{
                 "_identity":"${this._identity}",
                 "id":"${this.id}",
-                "typeName":"${this.typeName}",
-                "attributes":[${this.findAttribute((attr:UDAttribute)=>{
+                "typeName":"${this.getTypeName()}",
+                "attributes":[${this.findAttribute((attr)=>{
                     return attr.value!==attr.defaultValue || attr.unit!==attr.defaultUnit
                 }).map((attr)=>{
                     return attr.serialize(options)
@@ -69,24 +78,24 @@ class UDObject extends UDSerializable {
      * 接收输入的序列化字符串，进行反序列化，并设置到自身属性中
      * @param seriallizedString 
      */
-    deserialize(serializedString?: string) : void{
+    deserialize(serializedString){
         if(serializedString !== undefined){
             try{
                 let dataJson = JSON.parse(serializedString);
                 this.id = dataJson.id;
                 this._identity = dataJson._identity;
-                this.typeName = dataJson.typeName;
+                // this.typeName = dataJson.typeName;
                 this.attributes = {};
                 // 反序列化属性
                 let attrData  = dataJson.attributes;
-                attrData.forEach((attr:any)=>{
+                attrData.forEach((attr)=>{
                     // this.attributes[attr.name]= new UDAttribute({name:attr.name,unit:attr.unit,value:attr.value})
                     this.attributes[attr.name]= new UDAttribute({serializedString:JSON.stringify(attr)})
                 });
                 // 反序列化孩子
                 let childrenData = dataJson.children;
-                this.children = new Array<UDObject>();
-                childrenData.forEach( (element:{typeName:string}) => {
+                this.children = [];
+                childrenData.forEach( (element) => {
                     // let  child =new UDObject({serializedString:JSON.stringify(element),typeName:element.typeName});
                     let  child =createClassObject(element.typeName,{serializedString:JSON.stringify(element),typeName:element.typeName});
                     this.addChild(child);
@@ -105,7 +114,13 @@ class UDObject extends UDSerializable {
         }
     }
 
-    addAttribute(attName:string,defaultValue:any,defaultUnit:UDAttributeUnit|undefined){
+    /**
+     * 设置属性以及默认值
+     * @param {String} attName 
+     * @param {any} defaultValue 
+     * @param {Enums} defaultUnit 
+     */
+    setAttribute(attName,defaultValue,defaultUnit){
         // 如果该属性已经在了，则只修改默认值，不修改属性当前的值
         if(this.attributes.hasOwnProperty(attName)){
             this.attributes[attName].defaultValue = defaultValue
@@ -114,8 +129,8 @@ class UDObject extends UDSerializable {
             this.attributes[attName] = new UDAttribute({name:attName,value:defaultValue,defaultValue:defaultValue,unit:defaultUnit,defaultUnit:defaultUnit})
         }
     }
-    findAttribute(filter:(attr:UDAttribute)=>boolean):UDAttribute[]{
-        let ret: UDAttribute[]=[];
+    findAttribute(filter){
+        let ret=[];
         Object.keys(this.attributes).forEach((attName)=>{
             if(filter(this.attributes[attName])){
                 ret.push(this.attributes[attName])
@@ -128,16 +143,22 @@ class UDObject extends UDSerializable {
      * Tips:you should override this method in sub class
      * @param child 
      */
-    canAddChild(child:UDObject):boolean{
+    canAddChild(){
         return false; 
+    }
+    /**
+     * 子类必须实现这个方法，从而支持将类型信息序列化和反序列化
+     */
+    getTypeName(){
+        throw new Exception('sub class did not implement the [getTypeName] method!')
     }
 
     /**
      * get index of the child.-1 means not found
      * @param child 
      */
-    indexOfChild(child:UDObject){
-        let index:number = -1;
+    indexOfChild(child){
+        let index = -1;
 
         for(let i=0;i<this.children.length;i++){
             if(this.children[i]._identity === child._identity){
@@ -148,8 +169,8 @@ class UDObject extends UDSerializable {
         return index;
     }
 
-    addChild(child:UDObject){
-        if(this.indexOfChild(child)>-1){
+    addChild(child){
+        if(!this.canAddChild() || this.indexOfChild(child)>-1){
             return false;//the child is allready in
         }else{
             this.children.push(child);

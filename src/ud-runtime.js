@@ -3,15 +3,14 @@
 //     new() : T;
 // }
 
-let classDic : { [key: string]: any } = {
-};
+let classDic = {};
 
 /**
  * 注册一个类型
  * @param typeName 
  * @param constructorFunc 
  */
-var regClass = function(typeName :string,constructorFunc :any){
+var regClass = function(typeName ,constructorFunc){
     classDic[typeName] = constructorFunc
 }
 
@@ -20,7 +19,7 @@ var regClass = function(typeName :string,constructorFunc :any){
  * @param typeName
  * @param params 
  */
-var createClassObject = function(typeName:string,...params : any[]){
+var createClassObject = function(typeName,...params){
     let cons = classDic[typeName];
     if(cons!==undefined){
         // return cons.apply({},params)
