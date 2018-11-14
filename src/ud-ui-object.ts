@@ -9,14 +9,14 @@ class UDUIObject extends UDObject{
     
     constructor({typeName,serializedString}:{typeName: string,serializedString?: string}) {
         super({typeName,serializedString})
-
+ 
         // super.addAttribute("x",0,UDAttributeUnitEnum.px);
         // super.addAttribute("y",0,UDAttributeUnitEnum.px);
         // super.addAttribute("z",0,UDAttributeUnitEnum.px);
 
         this.addAttribute("x",0,UDAttributeUnitEnum.px);
         this.addAttribute("y",0,UDAttributeUnitEnum.px);
-        this.addAttribute("z",0,UDAttributeUnitEnum.px);
+        this.addAttribute("z",0,undefined);
     }
 }
 regClass("UDUIObject",UDUIObject)

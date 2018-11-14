@@ -21,7 +21,7 @@ var UDAttributeUnitEnum:{[key:string]:UDAttributeUnit}={
     px:"px",
     percentage:"percentage",
     angle:"angle",
-    none:"none",
+    // none:"none",
 }
 
 /**
