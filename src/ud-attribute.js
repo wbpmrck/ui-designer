@@ -1,12 +1,6 @@
 
-/**
- * 属性单位类型
- */
-const UDAttributeUnitEnum={
-    px:1,
-    percentage:2,
-    angle:3,
-}
+import {regEnums,regClass,createClassObject,Types} from "./ud-runtime"
+
 
 /**
  * 表示一个属性值
@@ -18,21 +12,41 @@ class UDAttribute{
      */
     name ;
     value ;
+    valueType; // 值的类型
+    defaultValue ;
+    defaultValueType ; //默认的值的类型
     unit ;
     defaultUnit ;
-    defaultValue ;
 
-    constructor({name,value,unit,defaultValue,defaultUnit,serializedString}){
+    static deserialize(serializedString){
+        if(serializedString !== undefined){
+            try{
+                let dataJson = JSON.parse(serializedString);
+                return new UDAttribute({
+                    name:dataJson.name,
+                    value:dataJson.value,
+                    unit:dataJson.unit
+                })
+                
+            }catch(e){
+                return undefined;
+            }
+        }
+    }
+    // constructor({name,value,unit,defaultValue,defaultUnit,serializedString}){
+    constructor({name,value,valueType,unit,defaultValue,defaultValueType,defaultUnit}){
         // 如果不是通过反序列化创建对象，则开始正常构造对象
-        if(serializedString!==undefined && serializedString!==null && serializedString.length>0){
-            this.deserialize(serializedString)
-        }else{
+        // if(serializedString!==undefined && serializedString!==null && serializedString.length>0){
+        //     this.deserialize(serializedString)
+        // }else{
             this.name=name;
             this.value=value;
-            this.unit=unit;
+            this.valueType=valueType;
             this.defaultValue = defaultValue
+            this.defaultValueType=defaultValueType;
+            this.unit=unit;
             this.defaultUnit = defaultUnit
-        }
+        // }
     }
 
     /**
@@ -53,27 +67,27 @@ class UDAttribute{
             return undefined
         }
     }   
-    /**
-     * 接收输入的序列化字符串，进行反序列化，并设置到自身属性中
-     * @param seriallizedString 
-     */
-    deserialize(seriallizedString){
-        if(seriallizedString !== undefined){
-            try{
-                let dataJson = JSON.parse(seriallizedString);
-                this.name = dataJson.name;
-                this.value = dataJson.value;
-                this.unit = dataJson.unit;
-                // this.defaultValue = dataJson.defaultValue;
-                // this.defaultUnit = dataJson.defaultUnit;
+    // /**
+    //  * 接收输入的序列化字符串，进行反序列化，并设置到自身属性中
+    //  * @param seriallizedString 
+    //  */
+    // deserialize(seriallizedString){
+    //     if(seriallizedString !== undefined){
+    //         try{
+    //             let dataJson = JSON.parse(seriallizedString);
+    //             this.name = dataJson.name;
+    //             this.value = dataJson.value;
+    //             this.unit = dataJson.unit;
+    //             // this.defaultValue = dataJson.defaultValue;
+    //             // this.defaultUnit = dataJson.defaultUnit;
                 
-            }catch(e){
-                console.error(e);
-            }
-        }
-    }
+    //         }catch(e){
+    //             console.error(e);
+    //         }
+    //     }
+    // }
 
 }
 
 
-export {UDAttribute,UDAttributeUnit,UDAttributeUnitEnum}
+export {UDAttribute}

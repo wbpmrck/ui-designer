@@ -7,11 +7,30 @@ class UDObject {
     // typeName; //类型名称
     parent; //节点的父亲节点
     children;  //节点的孩子
-    attributes;
+    attributes; //具有的属性
+    
+    actions; //对象具有的操作
+    events; // 对象会抛出的事件
 
 
+    // static deserialize(serializedString){
+    //     if(serializedString !== undefined){
+    //         try{
+    //             let dataJson = JSON.parse(serializedString);
+    //             return new UDAttribute({
+    //                 name:dataJson.name,
+    //                 value:dataJson.value,
+    //                 unit:dataJson.unit
+    //             })
+                
+    //         }catch(e){
+    //             return undefined;
+    //         }
+    //     }
+    // }
     // constructor({typeName,serializedString}) {
     constructor({serializedString}) {
+    // constructor() {
         // 如果不是通过反序列化创建对象，则开始正常构造对象
         if(serializedString!==undefined && serializedString!==null && serializedString.length>0){
             this.deserialize(serializedString)
@@ -21,6 +40,8 @@ class UDObject {
             this.parent = undefined;
             this.attributes = {};
             this.children = [];
+            this.actions = [];
+            this.events = [];
         }
     }
 
@@ -90,7 +111,8 @@ class UDObject {
                 let attrData  = dataJson.attributes;
                 attrData.forEach((attr)=>{
                     // this.attributes[attr.name]= new UDAttribute({name:attr.name,unit:attr.unit,value:attr.value})
-                    this.attributes[attr.name]= new UDAttribute({serializedString:JSON.stringify(attr)})
+                    // this.attributes[attr.name]= new UDAttribute({serializedString:JSON.stringify(attr)})
+                    this.attributes[attr.name]= UDAttribute.deserialize(JSON.stringify(attr))
                 });
                 // 反序列化孩子
                 let childrenData = dataJson.children;
@@ -151,6 +173,14 @@ class UDObject {
      */
     getTypeName(){
         throw new Exception('sub class did not implement the [getTypeName] method!')
+    }
+    /**
+     * 获取该类支持的事件类型。
+     * 
+     * 定义了一个类型支持的事件，从而可以允许可视化编辑器辅助用户进行相关配置
+     */
+    getSupportEvents(){
+        return [];
     }
 
     /**
