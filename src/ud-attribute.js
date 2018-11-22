@@ -18,15 +18,22 @@ class UDAttribute{
     unit ;
     defaultUnit ;
 
+    setValue(val){
+        if(val !== undefined){
+            //todo: 后期根据 valueType 增加参数类型检查功能
+            this.value = val;
+        }
+    }
     static deserialize(serializedString){
         if(serializedString !== undefined){
             try{
                 let dataJson = JSON.parse(serializedString);
-                return new UDAttribute({
-                    name:dataJson.name,
-                    value:dataJson.value,
-                    unit:dataJson.unit
-                })
+                // return new UDAttribute({
+                //     name:dataJson.name,
+                //     value:dataJson.value,
+                //     unit:dataJson.unit
+                // })
+                return new UDAttribute(dataJson)
                 
             }catch(e){
                 return undefined;
@@ -56,11 +63,11 @@ class UDAttribute{
     serialize(options){
         try{
             //如果自己当前的值等于默认值,则自己序列化输出无结果
-            if(this.defaultValue===this.value && this.defaultUnit === this.unit){
+            if(this.defaultValue===this.value && this.defaultValueType===this.valueType && this.defaultUnit === this.unit){
                 return undefined
             }else{
                 // return JSON.stringify({name:this.name,value:this.value,unit:this.unit,defaultValue:this.defaultValue,defaultUnit:this.defaultUnit})
-                return JSON.stringify({name:this.name,value:this.value,unit:this.unit})
+                return JSON.stringify({name:this.name,value:this.value,valueType:this.valueType,unit:this.unit})
             }
         }catch(e){
             console.error(e);
@@ -89,5 +96,27 @@ class UDAttribute{
 
 }
 
+// function createAttribute(attName,defaultValue,defaultValueType,defaultUnit){
+function createAttribute(defaultValue,defaultValueType,defaultUnit){
+    return new UDAttribute({ 
+        value:defaultValue,
+        valueType:defaultValueType,
+        defaultValue:defaultValue,
+        defaultValueType:defaultValueType,
+        unit:defaultUnit,
+        defaultUnit:defaultUnit
+    });
+}
+function createAttributeWithName(attName,defaultValue,defaultValueType,defaultUnit){
+    return new UDAttribute({ 
+        name:attName,
+        value:defaultValue,
+        valueType:defaultValueType,
+        defaultValue:defaultValue,
+        defaultValueType:defaultValueType,
+        unit:defaultUnit,
+        defaultUnit:defaultUnit
+    });
+}
 
-export {UDAttribute}
+export {UDAttribute,createAttribute,createAttributeWithName}

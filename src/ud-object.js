@@ -1,4 +1,4 @@
-import {UDAttribute,UDAttributeUnit} from "./ud-attribute"
+import {UDAttribute,createAttribute,createAttributeWithName} from "./ud-attribute"
 import {regClass,createClassObject} from "./ud-runtime"
 class UDObject {
     static identitySeed = 1;
@@ -75,7 +75,7 @@ class UDObject {
 
             let json = `{
                 "_identity":"${this._identity}",
-                "id":"${this.id}",
+                ${this.id===undefined?'':'"id":"'+this.id+'}",'}
                 "typeName":"${this.getTypeName()}",
                 "attributes":[${this.findAttribute((attr)=>{
                     return attr.value!==attr.defaultValue || attr.unit!==attr.defaultUnit
@@ -142,13 +142,14 @@ class UDObject {
      * @param {any} defaultValue 
      * @param {Enums} defaultUnit 
      */
-    setAttribute(attName,defaultValue,defaultUnit){
+    setAttribute(attName,defaultValue,defaultValueType,defaultUnit){
         // 如果该属性已经在了，则只修改默认值，不修改属性当前的值
         if(this.attributes.hasOwnProperty(attName)){
             this.attributes[attName].defaultValue = defaultValue
+            this.attributes[attName].defaultValueType = defaultValueType
             this.attributes[attName].defaultUnit = defaultUnit
         }else{
-            this.attributes[attName] = new UDAttribute({name:attName,value:defaultValue,defaultValue:defaultValue,unit:defaultUnit,defaultUnit:defaultUnit})
+            this.attributes[attName] = createAttributeWithName(attName,defaultValue,defaultValueType,defaultUnit)
         }
     }
     findAttribute(filter){

@@ -3,17 +3,35 @@
 */
 
 
-import {regEnums,regClass,createClassObject,Types} from "./ud-runtime"
+import {regEnums,regClass,createClassObject,Types,UDEnumBase} from "./ud-runtime"
 /**
  * 属性单位类型
  */
-let AttributeUnit=regEnums('AttributeUnit',(iota)=>{
+let UDAttributeUnit=regEnums('UDAttributeUnit',(iota)=>{
 return {
-        px:iota(),
-        percentage:iota(),
-        angle:iota(),
+        PX:iota(),
+        PERCENTAGE:iota(),
+        ANGLE:iota(),
+        NONE:iota(),
     }
 });
 
+// class AttributeUnit extends UDEnumBase{
+//     static PX='px'
+//     static PERCENTAGE='percent'
+//     static ANGLE='angle'
+//     static NONE='none'
 
-export {AttributeUnit}
+//     constructor(val){
+//         super(val)
+//     }
+// }
+
+/*
+  let a= AttributeUnit.PX;
+  isInstanceOf(a,AttributeUnit);
+  a === AttributeUnit.ANGLE; // false
+*/
+
+
+export {UDAttributeUnit}

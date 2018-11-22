@@ -12,7 +12,7 @@ class UDEvent{
     desc; //事件描述
     contextParams; //事件上下文参数.在事件处理函数中，可以使用这些参数
 
-    constructor(name,desc,contextParams) {
+    constructor({name,desc,contextParams}) {
         this.name = name;
         this.desc = desc;
         this.contextParams = contextParams;
