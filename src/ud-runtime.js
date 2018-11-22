@@ -84,13 +84,16 @@ var regEnums = function(name ,keyValuePairGenerator){
         if(keyValuePairObject.hasOwnProperty(name) ){
             throw new Error(`enum:[${name}] can not use 'name' as its value key!`)
         }else{
-            // keyValuePairObject.name=name; //使用name来表示一个类型的名称
-            var _enumCons = function(val){
-                this.val = val;
+            
+            // 下面创建一个临时的类构造函数，用来表示枚举类
+            var _enumCons = function(){
+                this.key = undefined;
+                this.val = undefined;
             }
             _enumCons.prototype.serialize = function(){
                 return this.val
             }
+
             /**
              * 获取枚举对象的key名
              */
@@ -102,17 +105,20 @@ var regEnums = function(name ,keyValuePairGenerator){
                     }
                 }
             }
-
             //自动创建枚举类的每个枚举值(对象)
             for(var key in keyValuePairObject){
-                _enumCons[key]= new _enumCons(keyValuePairObject[key]);
+                _enumCons[key]= new _enumCons();
+                _enumCons[key].key= key;
+                _enumCons[key].val= keyValuePairObject[key];
+
             }
+
 
             //当根据枚举值进行
             _enumCons.parse= (val)=>{
                 for(var key in keyValuePairObject){
-                    if(keyValuePairObject[key].val=== val){
-                        return keyValuePairObject[key];
+                    if(keyValuePairObject[key]=== val){
+                        return _enumCons[key];
                     }
                 }
             }
@@ -125,14 +131,10 @@ var regEnums = function(name ,keyValuePairGenerator){
                 configurable : true
               });
     
-    
-    
             // classDic[name] = keyValuePairObject;
             classDic[name] = _enumCons;
             return _enumCons;
         }
-
-       
     }
 }
 
