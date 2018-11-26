@@ -6,7 +6,7 @@ import {UDAttribute}  from "./ud-attribute"
 import {UDAttributeUnit}  from "./ud-unit"
 import  {regClass,createClassObject} from "./ud-runtime"
 import  UDTouch from "./gesture/ud-touch"
-import  UDTouchEvent from "./gesture/ud-touch-event"
+import  UDTouchEventContext from "./gesture/ud-touch-event-context"
 
 export  {
     createClassObject,
@@ -15,7 +15,7 @@ export  {
     UDUIObject,
     UDUIContainer,
     UDTouch,
-    UDTouchEvent,
+    UDTouchEventContext,
     UDAttributeUnit,
     UDAttribute
 }

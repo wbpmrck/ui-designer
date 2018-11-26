@@ -3,7 +3,7 @@
 */
 
 
-import {regEnums,regClass,createClassObject,Types,UDEnumBase} from "./ud-runtime"
+import {regEnums,regClass,createClassObject,Types} from "./ud-runtime"
 /**
  * 属性单位类型
  */

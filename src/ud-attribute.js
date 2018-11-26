@@ -1,6 +1,7 @@
 
 import {regEnums,regClass,createClassObject,Types} from "./ud-runtime"
 
+const className = 'UDAttribute'
 
 /**
  * 表示一个属性值
@@ -11,6 +12,7 @@ class UDAttribute{
      * 这里面的T应该都是简单类型，不要用属性去尝试保存一个对象
      */
     name ;
+    desc ;
     value ;
     valueType; // 值的类型
     defaultValue ;
@@ -20,7 +22,7 @@ class UDAttribute{
 
     setValue(val){
         if(val !== undefined){
-            //todo: 后期根据 valueType 增加参数类型检查功能
+            //TODO: 后期根据 valueType 增加参数类型检查功能
             this.value = val;
         }
     }
@@ -41,12 +43,13 @@ class UDAttribute{
         }
     }
     // constructor({name,value,unit,defaultValue,defaultUnit,serializedString}){
-    constructor({name,value,valueType,unit,defaultValue,defaultValueType,defaultUnit}){
+    constructor({name,desc,value,valueType,unit,defaultValue,defaultValueType,defaultUnit}){
         // 如果不是通过反序列化创建对象，则开始正常构造对象
         // if(serializedString!==undefined && serializedString!==null && serializedString.length>0){
         //     this.deserialize(serializedString)
         // }else{
             this.name=name;
+            this.desc=desc;
             this.value=value;
             this.valueType=valueType;
             this.defaultValue = defaultValue
@@ -97,8 +100,9 @@ class UDAttribute{
 }
 
 // function createAttribute(attName,defaultValue,defaultValueType,defaultUnit){
-function createAttribute(defaultValue,defaultValueType,defaultUnit){
+function createAttribute(desc,defaultValue,defaultValueType,defaultUnit){
     return new UDAttribute({ 
+        desc:desc,
         value:defaultValue,
         valueType:defaultValueType,
         defaultValue:defaultValue,
@@ -107,9 +111,10 @@ function createAttribute(defaultValue,defaultValueType,defaultUnit){
         defaultUnit:defaultUnit
     });
 }
-function createAttributeWithName(attName,defaultValue,defaultValueType,defaultUnit){
+function createAttributeWithName(attName,desc,defaultValue,defaultValueType,defaultUnit){
     return new UDAttribute({ 
         name:attName,
+        desc:desc,
         value:defaultValue,
         valueType:defaultValueType,
         defaultValue:defaultValue,
@@ -119,4 +124,5 @@ function createAttributeWithName(attName,defaultValue,defaultValueType,defaultUn
     });
 }
 
+regClass(className,UDAttribute)
 export {UDAttribute,createAttribute,createAttributeWithName}

@@ -1,17 +1,21 @@
 import {UDAttribute,createAttribute}  from "../ud-attribute"
-import {regEnums,regClass,createClassObject,Types} from "../ud-runtime"
+import {regEnums,regClass,createClassObject,Types,DECORATORS,field} from "../ud-runtime"
 
 import {UDAttributeUnit}  from "../ud-unit"
 import UDTouch from "./ud-touch"
 
-const className = 'UDTouchEvent'
+const className = 'UDTouchEventContext'
 /**
  * 表示可以被展示和显示的界面元素的容器
  * 注：UIContainer本身也是参与布局和渲染的
  */
-class UDTouchEvent{
+@DECORATORS.serializable(true)
+class UDTouchEventContext{
     
-    altKey=createAttribute(false,Types.BOOLEAN,UDAttributeUnit.NONE); //键盘 alt 键是否被按下
+    // @DECORATORS.serializable(true)
+    // @DECORATORS.field(Types.CLASS(UDAttribute))
+    altKey = field({type:Types.CLASS(UDAttribute),serializable:false}); //键盘 alt 键是否被按下
+    // altKey=createAttribute(false,Types.BOOLEAN,UDAttributeUnit.NONE); //键盘 alt 键是否被按下
     ctlKey=createAttribute(false,Types.BOOLEAN,UDAttributeUnit.NONE); //键盘 ctl 键是否被按下
     shiftKey=createAttribute(false,Types.BOOLEAN,UDAttributeUnit.NONE); //键盘 shift 键是否被按下
 
@@ -19,11 +23,10 @@ class UDTouchEvent{
     targetTouches=createAttribute([],Types.ARRAY(UDTouch),UDAttributeUnit.NONE); //一 个 Touch数组 对象，包含了如下触点的 Touch 对象：触摸起始于当前事件的目标 element 上，并且仍然没有离开触摸平面的触点。
 
     constructor({altKey,ctlKey,shiftKey}) {
-        this.altKey.setValue(altKey);
         this.ctlKey.setValue(ctlKey);
         this.shiftKey.setValue(shiftKey);
     }
 }
-regClass(className,UDTouchEvent)
+regClass(className,UDTouchEventContext)
 
-export default UDTouchEvent;
+export default UDTouchEventContext;

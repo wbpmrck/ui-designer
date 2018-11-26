@@ -1,7 +1,8 @@
 import UDObject from './ud-object'
 import UDEvent from './ud-event'
-import {UDAttribute,createAttribute}  from "./ud-attribute"
+import {UDAttribute,createAttribute,createAttributeWithName}  from "./ud-attribute"
 import {UDAttributeUnit}  from "./ud-unit"
+import UDTouchEventContext from "./gesture/ud-touch-event-context"
 import {regClass,createClassObject,Types} from "./ud-runtime"
 
 const className = 'UDUIObject'
@@ -15,27 +16,28 @@ class UDUIObject extends UDObject{
         super({serializedString})
  
         //横坐标，纵坐标，z坐标
-        this.setAttribute("x",0,Types.NUMBER,UDAttributeUnit.PX); 
-        this.setAttribute("y",0,Types.NUMBER,UDAttributeUnit.PX); 
-        this.setAttribute("z",0,Types.NUMBER,UDAttributeUnit.PX); 
+        this.setAttribute("x","x坐标",0,Types.NUMBER,UDAttributeUnit.PX); 
+        this.setAttribute("y","y坐标",0,Types.NUMBER,UDAttributeUnit.PX); 
+        this.setAttribute("z","z轴刻度",0,Types.NUMBER,UDAttributeUnit.PX); 
 
         //宽度，高度
-        this.setAttribute("w",0,Types.NUMBER,UDAttributeUnit.PX); 
-        this.setAttribute("h",0,Types.NUMBER,UDAttributeUnit.PX); 
+        this.setAttribute("w","宽度",0,Types.NUMBER,UDAttributeUnit.PX); 
+        this.setAttribute("h","高度",0,Types.NUMBER,UDAttributeUnit.PX); 
 
         this.events =[
-            // new UDEvent({name:'touch-start',desc:'手指按下',contextParams:[
-            //     new UDAttribute({
-            //         name:'',
-            //         desc,
-            //         value,
-            //         valueType,
-            //         unit,
-            //         defaultValue,
-            //         defaultValueType,
-            //         defaultUnit
-            //     })
-            // ]})
+            new UDEvent({name:'touch-start',desc:'手指按下',contextParams:[
+                createAttributeWithName('','',0,Types.NUMBER,UDAttributeUnit.PX)
+                // new UDAttribute({
+                //     name:'',
+                //     desc,
+                //     value,
+                //     valueType,
+                //     unit,
+                //     defaultValue,
+                //     defaultValueType,
+                //     defaultUnit
+                // })
+            ]})
         ]
     }
     getTypeName(){

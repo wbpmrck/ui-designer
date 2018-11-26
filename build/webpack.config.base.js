@@ -40,7 +40,11 @@ module.exports = {
                 "useESModules": false
               }
             ],
-            '@babel/plugin-proposal-class-properties'
+            ["@babel/plugin-proposal-decorators",{
+              // "decoratorsBeforeExport":true,
+               "legacy": true 
+              }],
+            ['@babel/plugin-proposal-class-properties',{ "loose" : true }]
           ]
           }
         }

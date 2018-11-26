@@ -142,14 +142,14 @@ class UDObject {
      * @param {any} defaultValue 
      * @param {Enums} defaultUnit 
      */
-    setAttribute(attName,defaultValue,defaultValueType,defaultUnit){
+    setAttribute(attName,desc,defaultValue,defaultValueType,defaultUnit){
         // 如果该属性已经在了，则只修改默认值，不修改属性当前的值
         if(this.attributes.hasOwnProperty(attName)){
             this.attributes[attName].defaultValue = defaultValue
             this.attributes[attName].defaultValueType = defaultValueType
             this.attributes[attName].defaultUnit = defaultUnit
         }else{
-            this.attributes[attName] = createAttributeWithName(attName,defaultValue,defaultValueType,defaultUnit)
+            this.attributes[attName] = createAttributeWithName(attName,desc,defaultValue,defaultValueType,defaultUnit)
         }
     }
     findAttribute(filter){

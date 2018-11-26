@@ -31,7 +31,7 @@ const Types ={
             // return `CLASS<${classDic[className].name}>`;
             return UDType.name;
         }else{
-            throw new Exeption(`class: [${UDType.name}] is not exist`) 
+            throw new Error(`class: [${UDType.name}] is not exist`) 
         }
        
     },
@@ -40,7 +40,7 @@ const Types ={
     //         // return `CLASS<${classDic[className].name}>`;
     //         return classDic[className].name;
     //     }else{
-    //         throw new Exeption(`class: [${className}] is not exist`) 
+    //         throw new Error(`class: [${className}] is not exist`) 
     //     }
        
     // },
@@ -48,7 +48,7 @@ const Types ={
     //     if(enumsDic.hasOwnProperty(enumName)){
     //         return `ENUM<${enumName}>`;
     //     }else{
-    //         throw new Exeption(`ENUM: [${enumName}] is not exist`) 
+    //         throw new Error(`ENUM: [${enumName}] is not exist`) 
     //     }
     // },
     EMPTY:'empty', //空值
@@ -61,7 +61,7 @@ const Types ={
  * @param {String} className 
  */
 function isInstanceOf(valueTarget,className){
-    // todo:根据className,进行细致的判断，确定valueTarget是否是指定类型的实例
+    // TODO:根据className,进行细致的判断，确定valueTarget是否是指定类型的实例
     return true;
 }
 
@@ -87,8 +87,8 @@ var regEnums = function(name ,keyValuePairGenerator){
             
             // 下面创建一个临时的类构造函数，用来表示枚举类
             var _enumCons = function(){
-                this.key = undefined;
-                this.val = undefined;
+                // this.key = undefined;
+                // this.val = undefined;
             }
             _enumCons.prototype.serialize = function(){
                 return this.val
@@ -108,8 +108,25 @@ var regEnums = function(name ,keyValuePairGenerator){
             //自动创建枚举类的每个枚举值(对象)
             for(var key in keyValuePairObject){
                 _enumCons[key]= new _enumCons();
-                _enumCons[key].key= key;
-                _enumCons[key].val= keyValuePairObject[key];
+
+                Object.defineProperty(_enumCons[key], "key", {
+                    get : function(){
+                        return key;
+                    },
+                    enumerable : true,
+                    configurable : true
+                });
+
+                Object.defineProperty(_enumCons[key], "val", {
+                    get : function(){
+                        return keyValuePairObject[key];
+                    },
+                    enumerable : true,
+                    configurable : true
+                });
+
+                // _enumCons[key].key= key;
+                // _enumCons[key].val= keyValuePairObject[key];
 
             }
 
@@ -187,13 +204,103 @@ var createClassObject = function(typeName,...params){
         // return cons.apply({},params)
         return new cons(...params)
     }else if(typeof cons === 'object'){
-        //todo:创建对应枚举值
+        //TODO:创建对应枚举值
     }
     else{
         return undefined
     }
     
 }
+
+//定义所有可以用来修饰类的修饰器
+const DECORATORS={
+    /**
+     * 修饰一个属性/方法，使得其只读
+     */
+    readonly:(target, name, descriptor)=>{
+        // descriptor对象原来的值如下
+        // {
+        //   value: specifiedFunction,
+        //   enumerable: false,
+        //   configurable: true,
+        //   writable: true
+        // };
+        descriptor.writable = false;
+        return descriptor;
+    },
+    /**
+     * 修饰类/属性，使其可以序列化
+     */
+    serializable:(canSerialize)=>{
+        if(canSerialize===undefined){
+            canSerialize = true; //默认是可以序列化的
+        }
+        return (target,name,descriptor)=>{
+            //如果修饰的是类
+            if(typeof target === 'function'){
+                target.__ud_serializable__ = canSerialize; //给类的构造函数添加一个标记，表示这个类是否可以序列化
+            }else{
+                //如果修饰的是属性
+                if(target.constructor === Field){
+                    targets.__ud_serializable__ = canSerialize;
+                }
+
+            }
+        }
+    },
+    /**
+     * FIXME:当前因为ECMAScript并不支持对属性进行修饰，所以此decorator无法使用。后续要么考虑换成TS
+     * 修饰字段，把它包装成一个属性
+     */
+    field:(typeName)=>{
+        if(typeName===undefined){
+            throw new Error('missing filed type!')
+        }
+        return (target, key, descriptor)=>{
+            //如果修饰的是类
+            if(typeof target === 'function'){
+                throw new Error('field decorator can not use on Class!')
+            }else{
+                // TODO:约定必须用在函数上，然后自动把这个函数编程类似KO.observable()的使用方式，可以直接set,get值
+                //如果修饰的是非函数的类成员属性
+                // if(typeof descriptor.value.constructor !== 'function'){\
+                let fieldInit= new Field({typeName});
+                    target[key] = fieldInit
+                    descriptor.value = fieldInit;
+
+                    window._s1 = target;
+                // }
+            }
+            return descriptor;
+            // return target;
+        }
+    },
+}
+
+class Field {
+    type=Types.ANY;
+    val=undefined;
+    __ud_serializable__ = true; //默认可以序列化
+
+    constructor({type,serializable}){
+        this.type = type;
+        this.__ud_serializable__ = serializable;
+    }
+
+    /**
+     * 设置属性
+     * TODO:以后可以考虑加入对newVal的类型检查
+     * @param {Object} newVal 
+     */
+    set(newVal){
+        this.val = newVal;
+    }
+}
+
+function field({type,serializable}){
+    return new Field({type,serializable});
+}
+
 
 /**
  * 注意：
@@ -203,8 +310,24 @@ var createClassObject = function(typeName,...params){
  */
 var serialize = function(targetObject){
 
+    //对一个对象进行序列化
     let _serializeData = function(target){
-        
+        let result;
+        //对象非空
+        if(target!==null && target !== undefined){
+            //检查是否有自定义的序列化方法
+            if(target.constructor.prototype.hasOwnProperty('serialize')){
+                result=target.serialize();
+            }else{
+                //如果没有该方法，则尝试自动序列化。
+                //首先看是否定义了不参与序列化的字段名列表(NOTICE:获取不需要序列化的字段，这个方法可以不提供，那么就以基类的为准。所以不从原型上判断，而是直接判断对象)
+                if(target.getNoSerializeFields){
+                    
+                }
+            }
+        }else{
+            return target;
+        }
     }
 
     return _serializeData(targetObject);
@@ -226,11 +349,5 @@ var deserialize = function(targetObject){
     return _deserializeData(targetObject);
 }
 
-/**
- * 所有枚举类的基类
- */
-class UDEnumBase {
-    val;
-}
 
-export {regClass,regEnums,createClassObject,Types,isInstanceOf,UDEnumBase}
+export {regClass,regEnums,createClassObject,Types,isInstanceOf,DECORATORS,field}
