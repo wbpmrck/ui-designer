@@ -1,4 +1,3 @@
-import {UDAttribute}  from "./ud-attribute"
 import {regEnums,regClass,createClassObject,Types} from "./ud-runtime"
 
 const className = 'UDEvent'

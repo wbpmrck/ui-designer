@@ -1,7 +1,7 @@
 
-import {regEnums,regClass,createClassObject,Types} from "./ud-runtime"
-
-const className = 'UDAttribute'
+// import {regEnums,regClass,createClassObject,Types} from "./ud-runtime"
+// import {UDAttributeUnit}  from "./ud-unit"
+// const className = 'UDAttribute'
 
 /**
  * 表示一个属性值
@@ -25,6 +25,14 @@ class UDAttribute{
             //TODO: 后期根据 valueType 增加参数类型检查功能
             this.value = val;
         }
+        return this;
+    }
+    setUnit(unit){
+        if(unit !== undefined){
+            //TODO: 后期根据 valueType 增加参数类型检查功能
+            this.unit = unit;
+        }
+        return this;
     }
     static deserialize(serializedString){
         if(serializedString !== undefined){
@@ -99,30 +107,41 @@ class UDAttribute{
 
 }
 
-// function createAttribute(attName,defaultValue,defaultValueType,defaultUnit){
-function createAttribute(desc,defaultValue,defaultValueType,defaultUnit){
-    return new UDAttribute({ 
-        desc:desc,
-        value:defaultValue,
-        valueType:defaultValueType,
-        defaultValue:defaultValue,
-        defaultValueType:defaultValueType,
-        unit:defaultUnit,
-        defaultUnit:defaultUnit
-    });
-}
-function createAttributeWithName(attName,desc,defaultValue,defaultValueType,defaultUnit){
-    return new UDAttribute({ 
-        name:attName,
-        desc:desc,
-        value:defaultValue,
-        valueType:defaultValueType,
-        defaultValue:defaultValue,
-        defaultValueType:defaultValueType,
-        unit:defaultUnit,
-        defaultUnit:defaultUnit
-    });
-}
+// // function createAttribute(attName,defaultValue,defaultValueType,defaultUnit){
+// function createAttribute(desc,defaultValue,defaultValueType){
+//     return new UDAttribute({ 
+//         desc:desc,
+//         value:defaultValue,
+//         valueType:defaultValueType,
+//         defaultValue:defaultValue,
+//         defaultValueType:defaultValueType,
+//         unit:UDAttributeUnit.NONE,
+//         defaultUnit:UDAttributeUnit.NONE
+//     });
+// }
+// function createAttributeWithUnit(desc,defaultValue,defaultValueType,defaultUnit){
+//     return new UDAttribute({ 
+//         desc:desc,
+//         value:defaultValue,
+//         valueType:defaultValueType,
+//         defaultValue:defaultValue,
+//         defaultValueType:defaultValueType,
+//         unit:defaultUnit,
+//         defaultUnit:defaultUnit
+//     });
+// }
+// function createAttributeWithName(attName,desc,defaultValue,defaultValueType,defaultUnit){
+//     return new UDAttribute({ 
+//         name:attName,
+//         desc:desc,
+//         value:defaultValue,
+//         valueType:defaultValueType,
+//         defaultValue:defaultValue,
+//         defaultValueType:defaultValueType,
+//         unit:defaultUnit,
+//         defaultUnit:defaultUnit
+//     });
+// }
 
 regClass(className,UDAttribute)
-export {UDAttribute,createAttribute,createAttributeWithName}
+// export {UDAttribute,createAttribute,createAttributeWithName}

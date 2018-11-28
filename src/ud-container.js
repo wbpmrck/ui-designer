@@ -1,5 +1,4 @@
 import UDObject from './ud-object'
-import {UDAttribute}  from "./ud-attribute"
 import {regClass,createClassObject} from "./ud-runtime"
 
 const className = 'UDContainer'
