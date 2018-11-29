@@ -8,26 +8,35 @@ const className = 'UDUIObject'
 /**
  * 表示可以被展示和显示的界面元素对象
  */
+@DECORATORS.serializable(true)
 class UDUIObject extends UDObject{
     
     static getTypeName(){
         return className
     }
     
+    @DECORATORS.serializable(true)
     @DECORATORS.field({type:Types.NUMBER,desc:'x坐标',value:0,unit:UDAttributeUnit.PX})
-    x;
+    x(){};
     
+    @DECORATORS.serializable(true)
     @DECORATORS.field({type:Types.NUMBER,desc:'y坐标',value:0,unit:UDAttributeUnit.PX})
-    y;
+    y(){};
+
+    @DECORATORS.serializable(true)
     @DECORATORS.field({type:Types.NUMBER,desc:'z轴刻度',value:0,unit:UDAttributeUnit.PX})
-    z;
+    z(){};
+
+    @DECORATORS.serializable(true)
     @DECORATORS.field({type:Types.NUMBER,desc:'宽度',value:0,unit:UDAttributeUnit.PX})
-    w;
+    w(){};
+
+    @DECORATORS.serializable(true)
     @DECORATORS.field({type:Types.NUMBER,desc:'高度',value:0,unit:UDAttributeUnit.PX})
-    h;
+    h(){};
     // constructor({typeName,serializedString}) {
-    constructor({serializedString}) {
-        super({serializedString})
+    constructor() {
+        super();
  
         // //横坐标，纵坐标，z坐标
         // this.setAttribute("x","x坐标",0,Types.NUMBER,UDAttributeUnit.PX); 

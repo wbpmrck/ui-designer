@@ -13,19 +13,20 @@ class UDObject {
     static identitySeed = 1;
     @DECORATORS.serializable(true)
     @DECORATORS.field({type:Types.STRING,desc:'自动化生成的唯一标识',value:''})
-    _identity; //自动化生成的唯一标识
+    // _identity; //自动化生成的唯一标识
+    _identity(){}; //自动化生成的唯一标识
 
 
     @DECORATORS.serializable(true)
     @DECORATORS.field({type:Types.STRING,desc:'允许外部指定的唯一标识',value:''})
-    id;//允许外部指定的唯一标识
+    id(){};//允许外部指定的唯一标识
 
     parent; //节点的父亲节点
 
     
     @DECORATORS.serializable(true)
-    @DECORATORS.field({type:Types.ARRAY(Types.CLASS(UDObject)),desc:'节点的孩子',value:[]})
-    children;  //节点的孩子
+    @DECORATORS.field({type:Types.ARRAY(Types.CLASS('UDObject')),desc:'节点的孩子',value:[]})
+    children(){};  //节点的孩子
     
 
     // constructor({serializedString}) {
@@ -188,8 +189,8 @@ class UDObject {
     indexOfChild(child){
         let index = -1;
 
-        for(let i=0;i<this.children.length;i++){
-            if(this.children[i]._identity === child._identity){
+        for(let i=0;i<this.children().value.length;i++){
+            if(this.children().value[i]._identity().value === child._identity){
                 index =  i;
                 break;
             }
@@ -201,7 +202,13 @@ class UDObject {
         if(!this.canAddChild() || this.indexOfChild(child)>-1){
             return false;//the child is allready in
         }else{
-            this.children.push(child);
+            let newChildren =this.children().value.slice();
+            newChildren.push(child);
+
+            //因为 children 属性在初始化的时候，很可能value和defaultValue是同一个数组引用。直接操作value的话，会导致default也发生改变
+            this.children({
+                value:newChildren
+            }); 
             child.parent = this;
             return true; 
         }

@@ -10,7 +10,7 @@
   "scripts": {
     "dev": "webpack  --progress --watch --hide-modules --config build/webpack.config.dev.js",
     "build": "webpack  --progress --hide-modules --config build/webpack.config.build.js",
-    "test": "mocha --recursive --full-trace ./test/**/*.js "
+    "test": "mocha --recursive --watch --full-trace ./test/**/*.js "
   },
   "repository": {
     "type": "git",
