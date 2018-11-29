@@ -1,5 +1,7 @@
 // import {UDAttribute,createAttribute,createAttributeWithName} from "./ud-attribute"
-import {regEnums,regClass,createClassObject,Types,DECORATORS,field} from "./ud-runtime"
+import {regEnums,regClass,createClassObject,Types,Type,DECORATORS,field,UDAttribute} from "./ud-runtime"
+import UDEvent from "./ud-event"
+import UDAction from "./ud-action"
 
 
 @DECORATORS.serializable(true)
@@ -11,21 +13,48 @@ class UDObject {
         return 'UDObject'
     }
     static identitySeed = 1;
+
+    /**
+     * 获取该类支持的事件类型。
+     * 
+     * 定义了一个类型支持的事件，从而可以允许可视化编辑器辅助用户进行相关配置
+     */
+    static getSupportEvents(){
+        return [
+            new UDEvent({name:'deleted',desc:'被删除',contextParams:[]})
+        ];
+    }
+
+    /**
+     * 获取该对象支持的行为
+     */
+    static getSupportActions(){
+        return [
+            new UDAction({name:'setAttr',desc:'设置属性',params:[
+                new UDAttribute({name:'touchEvent',desc:'按下的手势位置',valueType:Types.CLASS(UDTouch)})
+            ]}),
+            new UDAction({name:'delete',desc:'删除对象',params:[
+                new UDAttribute({name:'objectId',desc:'对象标识',valueType:Types.UDObjectID})
+            ]})
+        ];
+    }
+
+
     @DECORATORS.serializable(true)
-    @DECORATORS.field({type:Types.STRING,desc:'自动化生成的唯一标识',value:''})
+    @DECORATORS.field({type:String.getType(),desc:'自动化生成的唯一标识',value:''})
     // _identity; //自动化生成的唯一标识
     _identity(){}; //自动化生成的唯一标识
 
 
     @DECORATORS.serializable(true)
-    @DECORATORS.field({type:Types.STRING,desc:'允许外部指定的唯一标识',value:''})
+    @DECORATORS.field({type:String.getType(),desc:'允许外部指定的唯一标识',value:''})
     id(){};//允许外部指定的唯一标识
 
     parent; //节点的父亲节点
 
     
     @DECORATORS.serializable(true)
-    @DECORATORS.field({type:Types.ARRAY(Types.CLASS('UDObject')),desc:'节点的孩子',value:[]})
+    @DECORATORS.field({type:Types.ARRAY('UDObject'),desc:'节点的孩子',value:[]})
     children(){};  //节点的孩子
     
 
@@ -41,124 +70,6 @@ class UDObject {
         // }
     }
 
-
-    // /**
-    //  * 对自身进行序列化
-    //  * @param options ：可选参数，用于控制序列化的行为
-    //  */
-    // serialize(options){
-    //     try{
-           
-    //         /*
-    //             注意：
-    //             1.序列化的时候，父节点无需序列化。因为在反序列化的时候，一定是从父亲开始反序列化，这时候我们希望子节点指向的是父节点的引用。所以是由父节点
-    //             调用addChild来更新此字段的
-
-    //         */
-    //         // let json = `{
-    //         //     "_identity":"${this._identity}",
-    //         //     "id":"${this.id}",
-    //         //     "typeName":"${this.typeName}",
-    //         //     "attributes":[${this.findAttribute((attr)=>{
-    //         //         return attr.value!==attr.defaultValue || attr.unit!==attr.defaultUnit
-    //         //     }).map((attr)=>{
-    //         //         return attr.serialize(options)
-    //         //     }).join(",")}],
-    //         //     "children":[${this.children.map((child)=>{
-    //         //         return child.serialize(options)
-    //         //     }).join(",")}]
-    //         // }`;
-
-    //         let json = `{
-    //             "_identity":"${this._identity}",
-    //             ${this.id===undefined?'':'"id":"'+this.id+'}",'}
-    //             "typeName":"${this.getTypeName()}",
-    //             "attributes":[${this.findAttribute((attr)=>{
-    //                 return attr.value!==attr.defaultValue || attr.unit!==attr.defaultUnit
-    //             }).map((attr)=>{
-    //                 return attr.serialize(options)
-    //             }).join(",")}],
-    //             "children":[${this.children.map((child)=>{
-    //                 return child.serialize(options)
-    //             }).join(",")}]
-    //         }`
-
-
-    //             return json;
-            
-    //     }catch(e){
-    //         console.error(e);
-    //         return ""
-    //     }
-    // }
-    // /**
-    //  * 接收输入的序列化字符串，进行反序列化，并设置到自身属性中
-    //  * @param seriallizedString 
-    //  */
-    // deserialize(serializedString){
-    //     if(serializedString !== undefined){
-    //         try{
-    //             let dataJson = JSON.parse(serializedString);
-    //             this.id = dataJson.id;
-    //             this._identity = dataJson._identity;
-    //             // this.typeName = dataJson.typeName;
-    //             this.attributes = {};
-    //             // 反序列化属性
-    //             let attrData  = dataJson.attributes;
-    //             attrData.forEach((attr)=>{
-    //                 // this.attributes[attr.name]= new UDAttribute({name:attr.name,unit:attr.unit,value:attr.value})
-    //                 // this.attributes[attr.name]= new UDAttribute({serializedString:JSON.stringify(attr)})
-    //                 this.attributes[attr.name]= UDAttribute.deserialize(JSON.stringify(attr))
-    //             });
-    //             // 反序列化孩子
-    //             let childrenData = dataJson.children;
-    //             this.children = [];
-    //             childrenData.forEach( (element) => {
-    //                 // let  child =new UDObject({serializedString:JSON.stringify(element),typeName:element.typeName});
-    //                 let  child =createClassObject(element.typeName,{serializedString:JSON.stringify(element),typeName:element.typeName});
-    //                 this.addChild(child);
-    //             });
-
-
-    //             // this.props= {
-    //             //     name : dataJson.name,
-    //             //     value : dataJson.value,
-    //             //     unit : dataJson.unit,
-    //             //     defaultValue:undefined
-    //             // }
-    //         }catch(e){
-    //             console.error(e);
-    //         }
-    //     }
-    // }
-
-    // /**
-    //  * 设置属性以及默认值
-    //  * @param {String} attName 
-    //  * @param {any} defaultValue 
-    //  * @param {Enums} defaultUnit 
-    //  */
-    // setAttribute(attName,desc,defaultValue,defaultValueType,defaultUnit){
-    //     // 如果该属性已经在了，则只修改默认值，不修改属性当前的值
-    //     if(this.attributes.hasOwnProperty(attName)){
-    //         this.attributes[attName].defaultValue = defaultValue
-    //         this.attributes[attName].defaultValueType = defaultValueType
-    //         this.attributes[attName].defaultUnit = defaultUnit
-    //     }else{
-    //         this.attributes[attName] = createAttributeWithName(attName,desc,defaultValue,defaultValueType,defaultUnit)
-    //     }
-    // }
-    // findAttribute(filter){
-    //     let ret=[];
-    //     Object.keys(this.attributes).forEach((attName)=>{
-    //         if(filter(this.attributes[attName])){
-    //             ret.push(this.attributes[attName])
-    //         }
-    //     })
-    //     return ret;
-    // }
-    
-
     /**
      * 判断该对象能否添加目标类型的实例为自己的孩子
      * @param {TypeName} targetType 
@@ -166,22 +77,33 @@ class UDObject {
     canAddChild(targetType){
         return false; 
     }
-    /**
-     * 获取该类支持的事件类型。
-     * 
-     * 定义了一个类型支持的事件，从而可以允许可视化编辑器辅助用户进行相关配置
-     */
-    getSupportEvents(){
-        return [];
-    }
 
     /**
-     * 获取该对象支持的行为
+     * 移除某个孩子
+     * @param {UDObject} child 
      */
-    getSupportActions(){
-        return [];
-    }
+    removeChild(child){
+        let index = this.indexOfChild(child);
+        if(index>=0){
+            this.children.splice(index,1);
 
+            //TODO:在child身上触发“被删除”事件
+
+            return true;
+        }else{
+            return false;
+        }
+    }
+    /**
+     * 从应用中删除自身
+     */
+    delete(){
+        if(this.parent){
+            return this.parent.removeChild(this);
+        }else{
+            return false;
+        }
+    }
     /**
      * get index of the child.-1 means not found
      * @param child 

@@ -2,7 +2,8 @@ import UDObject from './ud-object'
 import UDEvent from './ud-event'
 import {UDAttributeUnit}  from "./ud-unit"
 import UDTouchEventContext from "./gesture/ud-touch-event-context"
-import {regEnums,regClass,createClassObject,Types,DECORATORS,field} from "./ud-runtime"
+import UDTouch from "./gesture/ud-touch"
+import {regEnums,regClass,createClassObject,Types,DECORATORS,field,UDAttribute} from "./ud-runtime"
 
 const className = 'UDUIObject'
 /**
@@ -14,54 +15,68 @@ class UDUIObject extends UDObject{
     static getTypeName(){
         return className
     }
+    /**
+     * 获取该类支持的事件类型。
+     * 
+     * 定义了一个类型支持的事件，从而可以允许可视化编辑器辅助用户进行相关配置
+     */
+    static getSupportEvents(){
+        return super.getSupportEvents().concat([
+            new UDEvent({name:'tap',desc:'手指/光标单击',contextParams:[]}),
+            new UDEvent({name:'touchStart',desc:'手指/光标按下',contextParams:[
+                new UDAttribute({name:'touchEvent',desc:'按下的手势位置',valueType:Types.CLASS(UDTouch)})
+            ]}),
+            new UDEvent({name:'move',desc:'手指/光标移动',contextParams:[
+                new UDAttribute({name:'touchEvent',desc:'移动过程中的手势信息',valueType:Types.CLASS(UDTouchEventContext)})
+            ]}),
+            new UDEvent({name:'touchEnd',desc:'手指/光标抬起',contextParams:[
+                new UDAttribute({name:'touchEvent',desc:'抬起的手势位置',valueType:Types.CLASS(UDTouch)})
+            ]}),
+            new UDEvent({name:'swipeLeft',desc:'手指/光标向左滑动',contextParams:[]}),
+            new UDEvent({name:'swipeRight',desc:'手指/光标向右滑动',contextParams:[]}),
+            new UDEvent({name:'swipeUp',desc:'手指/光标向上滑动',contextParams:[]}),
+            new UDEvent({name:'swipeDown',desc:'手指/光标向下滑动',contextParams:[]}),
+            new UDEvent({name:'mouseEnter',desc:'光标移入',contextParams:[]}),
+            new UDEvent({name:'mouseLeave',desc:'光标移出',contextParams:[]}),
+        ]);
+    }
+
+    /**
+     * 获取该对象支持的行为
+     */
+    static getSupportActions(){
+        return super.getSupportActions().concat([
+            '显示对象',
+            '隐藏对象',
+            '交替显示/隐藏对象',
+            '隐藏同层对象',
+            '置于顶层',
+            '置于底层',
+        ]);
+    }
     
     @DECORATORS.serializable(true)
-    @DECORATORS.field({type:Types.NUMBER,desc:'x坐标',value:0,unit:UDAttributeUnit.PX})
+    @DECORATORS.field({type:Number.getType(),desc:'x坐标',value:0,unit:UDAttributeUnit.PX})
     x(){};
     
     @DECORATORS.serializable(true)
-    @DECORATORS.field({type:Types.NUMBER,desc:'y坐标',value:0,unit:UDAttributeUnit.PX})
+    @DECORATORS.field({type:Number.getType(),desc:'y坐标',value:0,unit:UDAttributeUnit.PX})
     y(){};
 
     @DECORATORS.serializable(true)
-    @DECORATORS.field({type:Types.NUMBER,desc:'z轴刻度',value:0,unit:UDAttributeUnit.PX})
+    @DECORATORS.field({type:Number.getType(),desc:'z轴刻度',value:0,unit:UDAttributeUnit.PX})
     z(){};
 
     @DECORATORS.serializable(true)
-    @DECORATORS.field({type:Types.NUMBER,desc:'宽度',value:0,unit:UDAttributeUnit.PX})
+    @DECORATORS.field({type:Number.getType(),desc:'宽度',value:0,unit:UDAttributeUnit.PX})
     w(){};
 
     @DECORATORS.serializable(true)
-    @DECORATORS.field({type:Types.NUMBER,desc:'高度',value:0,unit:UDAttributeUnit.PX})
+    @DECORATORS.field({type:Number.getType(),desc:'高度',value:0,unit:UDAttributeUnit.PX})
     h(){};
     // constructor({typeName,serializedString}) {
     constructor() {
         super();
- 
-        // //横坐标，纵坐标，z坐标
-        // this.setAttribute("x","x坐标",0,Types.NUMBER,UDAttributeUnit.PX); 
-        // this.setAttribute("y","y坐标",0,Types.NUMBER,UDAttributeUnit.PX); 
-        // this.setAttribute("z","z轴刻度",0,Types.NUMBER,UDAttributeUnit.PX); 
-
-        // //宽度，高度
-        // this.setAttribute("w","宽度",0,Types.NUMBER,UDAttributeUnit.PX); 
-        // this.setAttribute("h","高度",0,Types.NUMBER,UDAttributeUnit.PX); 
-
-        this.events =[
-            // new UDEvent({name:'touch-start',desc:'手指按下',contextParams:[
-            //     createAttributeWithName('','',0,Types.NUMBER,UDAttributeUnit.PX)
-            //     // new UDAttribute({
-            //     //     name:'',
-            //     //     desc,
-            //     //     value,
-            //     //     valueType,
-            //     //     unit,
-            //     //     defaultValue,
-            //     //     defaultValueType,
-            //     //     defaultUnit
-            //     // })
-            // ]})
-        ]
     }
 }
 regClass(className,UDUIObject)
