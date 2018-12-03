@@ -12,9 +12,19 @@
 
 
 **TODO**
-- 完成Action类型设计
-- 完成EventHandler类型设计
+- 完成Action类型设计[ok]
+- 完成EventHandler类型设计 [ing]
+    - 定义operator,expression等类型。完善其内部实现
 - 完成runtime里的序列化、反序列化方法实现
+    - 序列化 [ok]
+    - 反序列化 [ing]
+        - 解决Object,UIObject,以及对应EventHandler信息的序列化、反序列化问题
+        - 2
+- 测试用例
+    - 枚举类型系统测试
+    - 类型系统，序列化、反序列化测试
+    - expression,operator系统测试
+
 
 **DONE**
 
@@ -50,3 +60,7 @@
 
 ## V0.7 内置领域对象、交互模型完善和迭代
 
+完善一些功能，比如：
+- 状态对象
+    - 可以定义app的状态
+    - 可以把状态的key与其他对象的某些Attribute进行关联，实现状态改变驱动界面元素变化的功能

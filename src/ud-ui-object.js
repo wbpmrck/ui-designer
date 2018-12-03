@@ -3,6 +3,7 @@ import UDEvent from './ud-event'
 import {UDAttributeUnit}  from "./ud-unit"
 import UDTouchEventContext from "./gesture/ud-touch-event-context"
 import UDTouch from "./gesture/ud-touch"
+import UDRange from "./enums/ud-range"
 import {regEnums,regClass,createClassObject,Types,DECORATORS,field,UDAttribute} from "./ud-runtime"
 
 const className = 'UDUIObject'
@@ -24,13 +25,13 @@ class UDUIObject extends UDObject{
         return super.getSupportEvents().concat([
             new UDEvent({name:'tap',desc:'手指/光标单击',contextParams:[]}),
             new UDEvent({name:'touchStart',desc:'手指/光标按下',contextParams:[
-                new UDAttribute({name:'touchEvent',desc:'按下的手势位置',valueType:Types.CLASS(UDTouch)})
+                new UDAttribute({name:'touchEvent',desc:'按下的手势位置',valueType:UDTouch.getType()})
             ]}),
             new UDEvent({name:'move',desc:'手指/光标移动',contextParams:[
-                new UDAttribute({name:'touchEvent',desc:'移动过程中的手势信息',valueType:Types.CLASS(UDTouchEventContext)})
+                new UDAttribute({name:'touchEvent',desc:'移动过程中的手势信息',valueType:UDTouchEventContext.getType()})
             ]}),
             new UDEvent({name:'touchEnd',desc:'手指/光标抬起',contextParams:[
-                new UDAttribute({name:'touchEvent',desc:'抬起的手势位置',valueType:Types.CLASS(UDTouch)})
+                new UDAttribute({name:'touchEvent',desc:'抬起的手势位置',valueType:UDTouch.getType()})
             ]}),
             new UDEvent({name:'swipeLeft',desc:'手指/光标向左滑动',contextParams:[]}),
             new UDEvent({name:'swipeRight',desc:'手指/光标向右滑动',contextParams:[]}),
@@ -46,14 +47,22 @@ class UDUIObject extends UDObject{
      */
     static getSupportActions(){
         return super.getSupportActions().concat([
-            '显示对象',
-            '隐藏对象',
-            '交替显示/隐藏对象',
-            '隐藏同层对象',
-            '置于顶层',
-            '置于底层',
+            new UDAction({name:'show',desc:'显示对象',params:[]}),
+            new UDAction({name:'hide',desc:'隐藏对象',params:[]}),
+            new UDAction({name:'toggleShow',desc:'交替显示/隐藏对象',params:[]}),
+            new UDAction({name:'placeZindexTop',desc:'置于顶层',params:[
+                new UDAttribute({name:'range',desc:'适用范围',valueType:UDRange.getType()})
+            ]}),
+            new UDAction({name:'placeZindexBottom',desc:'置于底层',params:[
+                new UDAttribute({name:'range',desc:'适用范围',valueType:UDRange.getType()})
+            ]})
         ]);
     }
+    
+
+    @DECORATORS.serializable(true)
+    @DECORATORS.field({type:Types.ARRAY('UDObject'),desc:'节点的孩子',value:[]})
+    children(){};  //节点的孩子
     
     @DECORATORS.serializable(true)
     @DECORATORS.field({type:Number.getType(),desc:'x坐标',value:0,unit:UDAttributeUnit.PX})

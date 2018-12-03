@@ -2,6 +2,7 @@
 import {regEnums,regClass,createClassObject,Types,Type,DECORATORS,field,UDAttribute} from "./ud-runtime"
 import UDEvent from "./ud-event"
 import UDAction from "./ud-action"
+import UDTouch from "./gesture/ud-touch"
 
 
 @DECORATORS.serializable(true)
@@ -31,7 +32,7 @@ class UDObject {
     static getSupportActions(){
         return [
             new UDAction({name:'setAttr',desc:'设置属性',params:[
-                new UDAttribute({name:'touchEvent',desc:'按下的手势位置',valueType:Types.CLASS(UDTouch)})
+                new UDAttribute({name:'attributesArray',desc:'要设置的属性列表',valueType:Types.ARRAY(UDAttribute.getType())})
             ]}),
             new UDAction({name:'delete',desc:'删除对象',params:[
                 new UDAttribute({name:'objectId',desc:'对象标识',valueType:Types.UDObjectID})
@@ -53,9 +54,6 @@ class UDObject {
     parent; //节点的父亲节点
 
     
-    @DECORATORS.serializable(true)
-    @DECORATORS.field({type:Types.ARRAY('UDObject'),desc:'节点的孩子',value:[]})
-    children(){};  //节点的孩子
     
 
     // constructor({serializedString}) {
@@ -79,22 +77,6 @@ class UDObject {
     }
 
     /**
-     * 移除某个孩子
-     * @param {UDObject} child 
-     */
-    removeChild(child){
-        let index = this.indexOfChild(child);
-        if(index>=0){
-            this.children.splice(index,1);
-
-            //TODO:在child身上触发“被删除”事件
-
-            return true;
-        }else{
-            return false;
-        }
-    }
-    /**
      * 从应用中删除自身
      */
     delete(){
@@ -102,37 +84,6 @@ class UDObject {
             return this.parent.removeChild(this);
         }else{
             return false;
-        }
-    }
-    /**
-     * get index of the child.-1 means not found
-     * @param child 
-     */
-    indexOfChild(child){
-        let index = -1;
-
-        for(let i=0;i<this.children().value.length;i++){
-            if(this.children().value[i]._identity().value === child._identity){
-                index =  i;
-                break;
-            }
-        }
-        return index;
-    }
-
-    addChild(child){
-        if(!this.canAddChild() || this.indexOfChild(child)>-1){
-            return false;//the child is allready in
-        }else{
-            let newChildren =this.children().value.slice();
-            newChildren.push(child);
-
-            //因为 children 属性在初始化的时候，很可能value和defaultValue是同一个数组引用。直接操作value的话，会导致default也发生改变
-            this.children({
-                value:newChildren
-            }); 
-            child.parent = this;
-            return true; 
         }
     }
 }

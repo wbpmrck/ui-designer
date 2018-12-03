@@ -70,7 +70,7 @@ var regEnums = function(name ,keyValuePairGenerator){
             }
 
 
-            //当根据枚举值进行
+            //当根据枚举值进行反序列化，得到预置好的枚举对象引用
             _enumCons.parse= (val)=>{
                 for(var key in keyValuePairObject){
                     if(keyValuePairObject[key]=== val){
@@ -122,200 +122,7 @@ function iota(){
     return _iota++;
 }
 
-//用于保存类型信息
-// FIXME: 之所以不直接使用构造函数本身作为类型实例（其实从概念上更贴切），是因为一些特殊的类型，在js中并没有对应的构造函数与之对应，举个例子:Array<Function>,Map<String,Object>等等。
-// 我们抽象一个类型的类型，缺点是一些本来就有的类型，需要调用其getType方法才可以拿到。好处是，这样可以兼容js中不存在的很多类型
-class Type{
-    name;
-    constructor(name){
-        this.name = name;
-    }
-    createInstance(...params){
 
-        //如果是值类型，则直接返回输入参数，因为序列化的结果就是值本身
-        //如果类型是任意值，那么直接返回构造函数调用时传入的参数即可
-        if(this.name ==='number' || this.name ==='boolean' ||this.name ==='string'|| this.name==='any'){
-            return params[0];
-        }
-        //对空值类型，返回空
-        if(this.name ==='empty' ){
-            return undefined;
-        }
-        
-        let cons = classDic[this.name];
-        if(cons!==undefined && typeof cons === 'function'){
-            // return cons.apply({},params)
-            return new cons(...params)
-        }else if(typeof cons === 'object'){
-            //TODO:创建对应枚举值
-        }
-        else{
-            return undefined
-        }
-    }
-}
-regClass('Type',Type);
-
-//混入Function,确保所有的构造函数都可以获取自己的类型对象
-Function.prototype.getType=function(){
-    if(this.name!==undefined && this.name !==''){
-        return new Type(this.name);
-    }else if(this.getTypeName){
-        return new Type(this.getTypeName())
-    }else{
-        throw new Error('can not getType!')
-    }
-    
-}
-
-//预置关于类型系统的辅助方法，和特殊类型
-const Types ={
-    // NUMBER:'number',
-    // NUMBER:new Type('Number'),
-    // BOOLEAN:'boolean',
-    // BOOLEAN:new Type('Boolean'),
-    // STRING:'string',
-    // STRING:new Type('String'),
-    // TYPE:new Type('Type'), //这是一种特殊的类型，这种类型的变量，专门保存类型信息
-    UDObjectID:new Type('ud-oid'),//专门把对象标识抽出一个类型，仅仅是为了在一些action取值的时候，编辑器可以针对这种类型的参数做选取的优化(可以让用户直接选择编辑器中对象)，然而序列化的时候，这种类型应该直接序列化Object.id
-    // ARRAY:(itemType)=>{
-    //     return `${itemType} []`
-    // },
-    
-
-    /**
-     * 获取某个类型的数组类型
-     */
-    ARRAY:(UDType)=>{
-        //UDType 可以是一个类型的名称，或者是一个Type对象
-        if(typeof UDType === 'string'){ 
-            return new Type(`${UDType} []`)
-        }else if(isInstanceOf(UDType,Type)){ 
-            return new Type(`${UDType.name} []`)
-        } else{
-            throw new Error(`class: [${UDType}] must be string or Type instance!`) 
-        }
-    },
-    MAP:(keyType,valueType)=>{
-        return new Type(`<${Types.CLASS(keyType)},${Types.CLASS(valueType)}>`)
-    },
-
-    //获取某个类型
-    CLASS:(UDType)=>{
-        if(typeof UDType === 'string'){ 
-            return new Type(`${UDType}`)
-        }else if(isInstanceOf(UDType,Type)){ 
-            return new Type(`${UDType.name}`)
-        } else{
-            throw new Error(`class: [${UDType}] must be string or Type instance!`) 
-        }
-        // if(classDic.hasOwnProperty(UDType.name)){
-        //     // return `CLASS<${classDic[className].name}>`;
-        //     return new Type(UDType.name);
-        // }else if(typeof UDType === 'string'){ 
-        //     //对于一些在decorator里指定自身类型的情况，不要求传入类型的构造函数（因为编译会报错），直接传入类型名称
-        //     return new Type(UDType);
-        // }
-        // else{
-        //     throw new Error(`class: [${UDType.name}] is not exist`) 
-        // }
-       
-    },
-    //获取指定对象的类型对象。必须传入对象实体不能传入函数。如果传入函数，一律返回Function类型
-    typeof:(target)=>{
-
-        let t = typeof target; 
-        let result = undefined;
-        
-        switch(t){
-            // switch(Types.typeof(target)){
-                case 'string':
-                case 'number':
-                case 'boolean':
-                    result = t.constructor.getType();
-                    break;
-                case 'undefined':
-                    result = Types.EMPTY;
-                    break;
-                case 'function':
-                    result = Types.FUNCTION; //正常来说，target应该是一个对象实例，如果传入函数，则直接返回function本身代表的类型
-                    break;
-                case 'object':
-                    //对象的情况:
-                    //对象非null
-                    if(target!==null){
-                        //对数组类型
-                        if(target.constructor===Array){
-                           //TODO:这里以数组的第一个元素的类型为准，但是如果数组的不同元素是不同的类型，那么也就无法根据数据本身来得到其实际的类型了
-                            result = Types.ARRAY(Types.typeof(target[0]));
-                        }
-                        //如果对象存在构造函数，则让构造函数获取自己的类型对象
-                        else{
-                            // result = Types.CLASS(target.constructor.getTypeName());
-                            result = target.constructor.getType();
-                        }
-                    }else{
-                        //对象是null
-                      result = Types.EMPTY;
-                    }
-                    break;
-            }
-
-        return result;
-    },
-    // CLASS:(className)=>{
-    //     if(classDic.hasOwnProperty(className)){
-    //         // return `CLASS<${classDic[className].name}>`;
-    //         return classDic[className].name;
-    //     }else{
-    //         throw new Error(`class: [${className}] is not exist`) 
-    //     }
-       
-    // },
-    // ENUM:(enumName)=>{
-    //     if(enumsDic.hasOwnProperty(enumName)){
-    //         return `ENUM<${enumName}>`;
-    //     }else{
-    //         throw new Error(`ENUM: [${enumName}] is not exist`) 
-    //     }
-    // },
-    EMPTY:new Type('empty'), //空值
-    FUNCTION:new Type('Function'), //函数
-    ANY:new Type('any'), //任意类型
-};
-
-/**
- * 判断对象是否是指定类型的实例
- * @param {Any} valueTarget 
- * @param {String} className 
- */
-function isInstanceOf(valueTarget,className){
-    if(typeof className === 'function'){
-        return valueTarget.constructor === className
-    }else{
-        return valueTarget.constructor.name === className
-    }
-}
-
-
-/**
- * 根据给定类型，动态创建一个类型的对象
- * @param typeName
- * @param params 
- */
-var createClassObject = function(typeName,...params){
-    let cons = classDic[typeName];
-    if(cons!==undefined && typeof cons === 'function'){
-        // return cons.apply({},params)
-        return new cons(...params)
-    }else if(typeof cons === 'object'){
-        //TODO:创建对应枚举值
-    }
-    else{
-        return undefined
-    }
-    
-}
 
 //定义所有可以用来修饰类的修饰器
 const DECORATORS={
@@ -421,6 +228,210 @@ const DECORATORS={
         }
     },
 }
+
+//用于保存类型信息
+// FIXME: 之所以不直接使用构造函数本身作为类型实例（其实从概念上更贴切），是因为一些特殊的类型，在js中并没有对应的构造函数与之对应，举个例子:Array<Function>,Map<String,Object>等等。
+// 我们抽象一个类型的类型，缺点是一些本来就有的类型，需要调用其getType方法才可以拿到。好处是，这样可以兼容js中不存在的很多类型
+
+
+@DECORATORS.serializable(true)
+class Type{
+    name;
+    constructor(name){
+        this.name = name;
+    }
+    serialize(){
+        return this.name;
+    }
+    createInstance(...params){
+
+        //如果是值类型，则直接返回输入参数，因为序列化的结果就是值本身
+        //如果类型是任意值，那么直接返回构造函数调用时传入的参数即可
+        if(this.name ==='number' || this.name ==='boolean' ||this.name ==='string'|| this.name==='any'){
+            return params[0];
+        }
+        //对空值类型，返回空
+        if(this.name ==='empty' ){
+            return undefined;
+        }
+        
+        let cons = classDic[this.name];
+        if(cons!==undefined && typeof cons === 'function'){
+            // return cons.apply({},params)
+            return new cons(...params)
+        }else if(typeof cons === 'object'){
+            //TODO:创建对应枚举值
+        }
+        else{
+            return undefined
+        }
+    }
+}
+regClass('Type',Type);
+
+//混入Function,确保所有的构造函数都可以获取自己的类型对象
+Function.prototype.getType=function(){
+    if(this.name!==undefined && this.name !==''){
+        return new Type(this.name);
+    }else if(this.getTypeName){
+        return new Type(this.getTypeName())
+    }else{
+        throw new Error('can not getType!')
+    }
+    
+}
+
+//预置关于类型系统的辅助方法，和特殊类型
+const Types ={
+    // NUMBER:'number',
+    // NUMBER:new Type('Number'),
+    // BOOLEAN:'boolean',
+    // BOOLEAN:new Type('Boolean'),
+    // STRING:'string',
+    // STRING:new Type('String'),
+    // TYPE:new Type('Type'), //这是一种特殊的类型，这种类型的变量，专门保存类型信息
+    UDObjectID:new Type('ud-oid'),//专门把对象标识抽出一个类型，仅仅是为了在一些action取值的时候，编辑器可以针对这种类型的参数做选取的优化(可以让用户直接选择编辑器中对象)，然而序列化的时候，这种类型应该直接序列化Object.id
+    // ARRAY:(itemType)=>{
+    //     return `${itemType} []`
+    // },
+    
+
+    /**
+     * 获取某个类型的数组类型
+     */
+    ARRAY:(UDType)=>{
+        //UDType 可以是一个类型的名称，或者是一个Type对象
+        if(typeof UDType === 'string'){ 
+            return new Type(`${UDType} []`)
+        }else if(isInstanceOf(UDType,Type)){ 
+            return new Type(`${UDType.name} []`)
+        } else{
+            throw new Error(`class: [${UDType}] must be string or Type instance!`) 
+        }
+    },
+    MAP:(keyType,valueType)=>{
+        return new Type(`<${Types.CLASS(keyType).name},${Types.CLASS(valueType).name}>`)
+    },
+
+    //获取某个类型
+    CLASS:(UDType)=>{
+        if(typeof UDType === 'string'){ 
+            return new Type(`${UDType}`)
+        }else if(isInstanceOf(UDType,Type)){ 
+            return UDType;
+        } else{
+            throw new Error(`class: [${UDType}] must be string or Type instance!`) 
+        }
+        // if(classDic.hasOwnProperty(UDType.name)){
+        //     // return `CLASS<${classDic[className].name}>`;
+        //     return new Type(UDType.name);
+        // }else if(typeof UDType === 'string'){ 
+        //     //对于一些在decorator里指定自身类型的情况，不要求传入类型的构造函数（因为编译会报错），直接传入类型名称
+        //     return new Type(UDType);
+        // }
+        // else{
+        //     throw new Error(`class: [${UDType.name}] is not exist`) 
+        // }
+       
+    },
+    //获取指定对象的类型对象。必须传入对象实体不能传入函数。如果传入函数，一律返回Function类型
+    typeof:(target)=>{
+
+        let t = typeof target; 
+        let result = undefined;
+        
+        switch(t){
+            // switch(Types.typeof(target)){
+                case 'string':
+                case 'number':
+                case 'boolean':
+                    result = t.constructor.getType();
+                    break;
+                case 'undefined':
+                    result = Types.EMPTY;
+                    break;
+                case 'function':
+                    result = Types.FUNCTION; //正常来说，target应该是一个对象实例，如果传入函数，则直接返回function本身代表的类型
+                    break;
+                case 'object':
+                    //对象的情况:
+                    //对象非null
+                    if(target!==null){
+                        //对数组类型
+                        if(target.constructor===Array){
+                           //TODO:这里以数组的第一个元素的类型为准，但是如果数组的不同元素是不同的类型，那么也就无法根据数据本身来得到其实际的类型了
+                            result = Types.ARRAY(Types.typeof(target[0]));
+                        }
+                        //如果对象存在构造函数，则让构造函数获取自己的类型对象
+                        else{
+                            // result = Types.CLASS(target.constructor.getTypeName());
+                            result = target.constructor.getType();
+                        }
+                    }else{
+                        //对象是null
+                      result = Types.EMPTY;
+                    }
+                    break;
+            }
+
+        return result;
+    },
+    // CLASS:(className)=>{
+    //     if(classDic.hasOwnProperty(className)){
+    //         // return `CLASS<${classDic[className].name}>`;
+    //         return classDic[className].name;
+    //     }else{
+    //         throw new Error(`class: [${className}] is not exist`) 
+    //     }
+       
+    // },
+    // ENUM:(enumName)=>{
+    //     if(enumsDic.hasOwnProperty(enumName)){
+    //         return `ENUM<${enumName}>`;
+    //     }else{
+    //         throw new Error(`ENUM: [${enumName}] is not exist`) 
+    //     }
+    // },
+    EMPTY:new Type('empty'), //空值
+    FUNCTION:new Type('Function'), //函数
+    ANY:new Type('any'), //任意类型
+};
+
+/**
+ * 判断对象是否是指定类型的实例
+ * @param {Any} valueTarget 
+ * @param {String} classNameOrTypeObject :类型名称、或者类型对象、或者类型的构造函数
+ */
+function isInstanceOf(valueTarget,classNameOrTypeObject){
+    if(typeof classNameOrTypeObject === 'function'){
+        return valueTarget.constructor === classNameOrTypeObject
+    }else if(classNameOrTypeObject.constructor === Type){
+        return valueTarget.constructor.name === classNameOrTypeObject.name
+    }else{
+        return valueTarget.constructor.name === classNameOrTypeObject
+    }
+}
+
+
+/**
+ * 根据给定类型，动态创建一个类型的对象
+ * @param typeName
+ * @param params 
+ */
+var createClassObject = function(typeName,...params){
+    let cons = classDic[typeName];
+    if(cons!==undefined && typeof cons === 'function'){
+        // return cons.apply({},params)
+        return new cons(...params)
+    }else if(typeof cons === 'object'){
+        //TODO:创建对应枚举值
+    }
+    else{
+        return undefined
+    }
+    
+}
+
 
 /**
  * 在ui-designer里，所有编辑器模式下的类型信息，其字段都应该是Attribute类的实例，哪怕是一个整数，也必须如此
