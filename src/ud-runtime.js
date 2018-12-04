@@ -595,13 +595,60 @@ var serialize = function(targetObject,callCount){
  * TODO:还可以优化，支持传入指定类型信息，则序列化的结果就可以不包含类型信息。反序列化的时候，需要根据上一层已经反序列化出的类型信息，来查看内部字段的类型，并进行反序列化（查找对应的构造函数，来创建对象）
  * @param {Object} targetObject 
  */
-var deserialize = function(targetObject){
+var deserialize = function(serializedString){
 
-    let _deserializeData = function(target){
+    //1.首先，把json字符串转化为数据对象
+    let jsonOfData = JSON.parse(serializedString);
+
+    //2.开始反序列化数据对象
+    let _deserializeData = function(data){
+        let t = typeof data;
+        switch(t){
+            case 'string':
+            case 'number':
+            case 'boolean':
+            case 'undefined':
+                return data; //对于简单类型，直接返回数据自身
+            case 'function':
+                // 如果是函数
+                throw new Error(`function can not be deserialized!`)
+            case 'object':
+                // 如果是数组，则对数组每个元素进行反序列化，然后一起返回
+                if(data.constructor === Array){
+                    let arr =[];
+                    for(var i=0;i<data.length;i++){
+                        let obj = _deserializeData(data[i])
+                        arr.push(obj)
+                    }
+                    return arr;
+                }else{
+                    // 如果是对象,则首先判断对象有没有自定义类型
+                    let customType = data.__ud_class_name__;
+                    if(customType){
+                        // 如果有，则创建自定义类型对象，然后遍历对象的field访问器，一个个去赋值
+                        let obj = createClassObject(customType);
+
+                        delete data['__ud_class_name__']; // 删掉省得呆会影响属性的遍历
+                        for(var filedName in data){
+                            let filedObject = _deserializeData(data[filedName].value); //TODO:如果以后Attribute的序列化优化掉了value选项，则这里的value也需要删除
+                            obj[filedName] && obj[filedName]({value:filedObject})
+                        }
+                        return obj;
+
+                    }else{
+                        // 如果没有自定义类型，则报错（因为当前版本，不带自定义类型的对象是不应该参与序列化的）
+                        throw new Error(`can not find class name of Object:${JSON.stringify(data)}`)
+                    }
+                }
+            break;
+            default:
+                throw new Error(`type of data is ${t},can not be deserialized!`)
+            break;
+        }
         
     }
 
-    return _deserializeData(targetObject);
+    return _deserializeData(jsonOfData);
 }
 
 
@@ -724,4 +771,4 @@ class UDAttribute{
 
 }
 
-export {regClass,regEnums,createClassObject,Types,Type,isInstanceOf,DECORATORS,field,serialize,UDAttribute}
+export {regClass,regEnums,createClassObject,Types,Type,isInstanceOf,DECORATORS,field,serialize,deserialize,UDAttribute}

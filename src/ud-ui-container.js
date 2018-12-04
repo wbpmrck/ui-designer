@@ -1,5 +1,7 @@
 import UDUIObject from './ud-ui-object'
 import UDEvent from './ud-event'
+import UDObject from "./ud-object"
+import UDAction from "./ud-action"
 import {regEnums,regClass,createClassObject,Types,DECORATORS,field,UDAttribute} from "./ud-runtime"
 
 const className = 'UDUIContainer'

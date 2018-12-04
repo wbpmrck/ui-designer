@@ -5,12 +5,13 @@ import UDContainer  from "./ud-container"
 import UDUIContainer  from "./ud-ui-container"
 // import {UDAttribute}  from "./ud-attribute"
 import {UDAttributeUnit}  from "./ud-unit"
-import  {regClass,createClassObject,serialize} from "./ud-runtime"
+import  {regClass,createClassObject,serialize,deserialize} from "./ud-runtime"
 import  UDTouch from "./gesture/ud-touch"
 import  UDTouchEventContext from "./gesture/ud-touch-event-context"
 
 export  {
     serialize,
+    deserialize,
     createClassObject,
     regClass,
     UDObjec,

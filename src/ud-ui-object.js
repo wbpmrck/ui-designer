@@ -4,6 +4,7 @@ import {UDAttributeUnit}  from "./ud-unit"
 import UDTouchEventContext from "./gesture/ud-touch-event-context"
 import UDTouch from "./gesture/ud-touch"
 import UDRange from "./enums/ud-range"
+import UDAction from "./ud-action"
 import {regEnums,regClass,createClassObject,Types,DECORATORS,field,UDAttribute} from "./ud-runtime"
 
 const className = 'UDUIObject'

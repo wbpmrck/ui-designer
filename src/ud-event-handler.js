@@ -1,4 +1,6 @@
 import {regEnums,regClass,createClassObject,Types,DECORATORS,field,UDAttribute} from "./ud-runtime"
+import UDAction from "./ud-action"
+import UDExpression from './logic/ud-expression'
 
 const className = 'UDEventHandler'
 /**
@@ -16,9 +18,23 @@ class UDEventHandler{
 
     @DECORATORS.serializable(true)
     @DECORATORS.field({type:String.getType(),desc:'事件名称',value:''})
-    eventName(){};  //节点的孩子
+    eventName(){};  //事件名称
 
-    constructor() {
+
+    @DECORATORS.serializable(true)
+    @DECORATORS.field({type:UDExpression.getType(),desc:'事件发生条件表达式',value:undefined})
+    expression(){};  //事件发生条件表达式
+
+    @DECORATORS.serializable(true)
+    @DECORATORS.field({type:Types.ARRAY(UDAction.getType()),desc:'事件响应行为列表',value:[]})
+    actions(){};  //事件响应行为列表
+
+    
+
+    constructor({eventName,expression,actions}) {
+        this.eventName({value:eventName});
+        this.expression({value:expression});
+        this.actions({value:actions});
     }
 }
 regClass(className,UDEventHandler)
