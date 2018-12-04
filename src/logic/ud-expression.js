@@ -22,9 +22,9 @@ class UDExpression{
     // @DECORATORS.field({type:Type.getType(),desc:'返回值类型',value:Types.ANY})
     // returnType(){};  //表达式的返回类型
 
-    @DECORATORS.serializable(true)
-    @DECORATORS.field({type:Types.ANY,desc:'返回值',value:undefined})
-    returnValue(){};  //表达式实际返回的值
+    // @DECORATORS.serializable(true)
+    // @DECORATORS.field({type:Types.ANY,desc:'返回值',value:undefined})
+    // returnValue(){};  //表达式实际返回的值
 
 
     @DECORATORS.serializable(true)
@@ -55,24 +55,28 @@ class UDExpression{
         let rightOperand = this.rightOperand();
         //先计算左操作数
         if(isInstanceOf(leftOperand,'UDExpression')){
-            leftOperand = leftOperand.execute().returnValue().value;
+            // leftOperand = leftOperand.execute().returnValue().value;
+            leftOperand = leftOperand.execute();
         }
 
         //再计算右操作数
         if(isInstanceOf(rightOperand,'UDExpression')){
-            rightOperand = rightOperand.execute().returnValue().value;
+            // rightOperand = rightOperand.execute().returnValue().value;
+            rightOperand = rightOperand.execute();
         }
 
         //使用操作符，对左右2个操作数进行操作，并返回一个值
 
         //如果没有操作符，则表示是一个字面量表达式，返回左操作数即可
         if(op === undefined){
-            this.returnValue({value:leftOperand});
+            // this.returnValue({value:leftOperand});
+            return leftOperand;
         }else{
             //否则，使用操作符来计算结果
-            this.returnValue({value:op.operateOn(leftOperand,rightOperand)});
+            // this.returnValue({value:op.operateOn(leftOperand,rightOperand)});
+            return op.operateOn(leftOperand,rightOperand);
         }
-        return this;
+        // return this;
     }
 }
 regClass(className,UDExpression)

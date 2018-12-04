@@ -25,12 +25,17 @@ var regEnums = function(name ,keyValuePairGenerator){
         }else{
             
             // 下面创建一个临时的类构造函数，用来表示枚举类
-            var _enumCons = function(){
+            var _enumCons = function({val}){
                 // this.key = undefined;
                 // this.val = undefined;
+                if(val !== undefined){
+                    return _enumCons.parse(val);
+                }
             }
+            _enumCons.__ud_serializable__ = true; //默认，所有的枚举类型都是可序列化的
             _enumCons.prototype.serialize = function(){
-                return this.val
+                console.log(`prepare serialize enum:[${this.constructor.name}],this.key=[${this.key}],this.value=[${this.val}]`)
+                return JSON.stringify({val:this.val});
             }
 
             /**
@@ -46,26 +51,28 @@ var regEnums = function(name ,keyValuePairGenerator){
             }
             //自动创建枚举类的每个枚举值(对象)
             for(var key in keyValuePairObject){
-                _enumCons[key]= new _enumCons();
+                _enumCons[key]= new _enumCons({});
 
-                Object.defineProperty(_enumCons[key], "key", {
-                    get : function(){
-                        return key;
-                    },
-                    enumerable : true,
-                    configurable : true
-                });
 
-                Object.defineProperty(_enumCons[key], "val", {
-                    get : function(){
-                        return keyValuePairObject[key];
-                    },
-                    enumerable : true,
-                    configurable : true
-                });
+                // 2018年12月04日 修改直接赋值，这样虽然会有用户修改枚举值的风险（较小），但是可以避免使用闭包来实现正确的getter,(否则枚举key,val的getter只会返回最后一个枚举值)
+                // Object.defineProperty(_enumCons[key], "key", {
+                //     get : function(){
+                //         return key;
+                //     },
+                //     enumerable : true,
+                //     configurable : true
+                // });
 
-                // _enumCons[key].key= key;
-                // _enumCons[key].val= keyValuePairObject[key];
+                // Object.defineProperty(_enumCons[key], "val", {
+                //     get : function(){
+                //         return keyValuePairObject[key];
+                //     },
+                //     enumerable : true,
+                //     configurable : true
+                // });
+
+                _enumCons[key].key= key;
+                _enumCons[key].val= keyValuePairObject[key];
 
             }
 
@@ -479,107 +486,113 @@ var serialize = function(targetObject,callCount){
     let _serializeData = function(key,target,parent,targetTypeDeclared){
 
         console.log(`serialize:[${key}] `)
+        let t = typeof target;
 
-        switch(typeof target){
-        // switch(Types.typeof(target)){
-            case 'string':
-                _appendKeyValue(key,`"${target.toString()}"`)
-                if(parent===undefined){
-                    _removeTailComma();
-                }
-                // resultBuffer.push('"'+target.toString()+'"'); //字符串在JSON中需要补齐双引号
-                
-                break;
-            case 'number':
-            case 'boolean':
-                _appendKeyValue(key,target.toString())//非字符串类型不需双引号
-                if(parent===undefined){
-                    _removeTailComma();
-                }
-                // resultBuffer.push(`"${key}":${target.toString()}`); 
-                break;
-            case 'undefined':
-                //undefined不需要序列化
-                break;
-            case 'function':
-                //如果是属性访问器,且是可序列化的，则取里面的属性进行序列化
-                if(target.__ud_attribute__ && target.__ud_serializable__){
-                    // let attr = parent[key]();
-
-                    let propertyName = `__ud_attribute_${key}__`;
-
-                    //因为 field decorator 会在存取器第一次调用的时候，才能拿到实例引用，从而在实例内部注入attribute，所以了能存在undefined的情况 ，此时无需进行序列化
-                    if(parent[propertyName] !== undefined){
-
-                        let attrVal = parent[propertyName].serialize();
-
-                        if(attrVal!== undefined){
-                            _appendKeyValue(key,attrVal);
-                            if(parent===undefined){
-                                _removeTailComma();
-                            }
-                        }
-                    }
-                    
-                }
-                break;
-            case 'object':
-                //对象的情况:
-                //对象非null
-                if(target!==null){
-                    //对于日期类型
-                    if(target.constructor === Date){
-                        resultBuffer.push(JSON.stringify(target));
-                    }else if(target.constructor===Array &&parent===undefined  ){ // 如果有parent，则只有存取器、简单类型才可以参与序列化，复杂类型全部要走存取器来定义
-
-                        resultBuffer.push('[');
-                        //如果字段是数组，则分别进行序列化
-                        for(var index=0;index<target.length;index++){
-                            _serializeData(undefined,target[index],undefined);
-                            resultBuffer.push(',');
-                        }
-                        _removeTailComma();
-                        resultBuffer.push(']');
-                    }
-                    else{
-                        //如果是其他对象类型
-                        //如果没有持有对象，则看类型本身是否允许序列化()。如果有持有对象，则需要序列化的字段不应该是object，二应该是存取器function
-                        if( target.constructor.__ud_serializable__&&parent===undefined ){
-                            //检查是否有自定义的序列化方法
-                            if(target.constructor.prototype.hasOwnProperty('serialize')){
-                                let temp = JSON.parse(target.serialize());
-                                temp.__ud_class_name__ = Types.typeof(target).name;
-                                _appendKeyValue(key,JSON.stringify(temp));
-                                if(parent===undefined){
-                                    _removeTailComma();
-                                }
-                            }else{
-                                resultBuffer.push('{');
-                                //如果没有该方法，则尝试自动序列化。
-                                //遍历其中的每个字段，对其进行序列化
-                                for(var fieldName in target){
-                                    let fieldOfTarget = target[fieldName];
-                                    _serializeData(fieldName,fieldOfTarget,target);
-                                }
-                                _appendKeyValue('__ud_class_name__',`"${Types.typeof(target).name}"`);
-                                _removeTailComma();
-                                resultBuffer.push('}');
-                            }
-                        }else{
-                            console.log('no need to serialize')
-                        }
-                    }
-
-
-                }else{
-                    //对象是null
-                    _appendKeyValue(key,'null')
+        try{
+            switch(t){
+            // switch(Types.typeof(target)){
+                case 'string':
+                console.log()
+                    _appendKeyValue(key,`"${target.toString()}"`)
                     if(parent===undefined){
                         _removeTailComma();
                     }
-                    // resultBuffer.push('null');
-                }
-                break;
+                    // resultBuffer.push('"'+target.toString()+'"'); //字符串在JSON中需要补齐双引号
+                    
+                    break;
+                case 'number':
+                case 'boolean':
+                    _appendKeyValue(key,target.toString())//非字符串类型不需双引号
+                    if(parent===undefined){
+                        _removeTailComma();
+                    }
+                    // resultBuffer.push(`"${key}":${target.toString()}`); 
+                    break;
+                case 'undefined':
+                    //undefined不需要序列化
+                    break;
+                case 'function':
+                    //如果是属性访问器,且是可序列化的，则取里面的属性进行序列化
+                    if(target.__ud_attribute__ && target.__ud_serializable__){
+                        // let attr = parent[key]();
+
+                        let propertyName = `__ud_attribute_${key}__`;
+
+                        //因为 field decorator 会在存取器第一次调用的时候，才能拿到实例引用，从而在实例内部注入attribute，所以了能存在undefined的情况 ，此时无需进行序列化
+                        if(parent[propertyName] !== undefined){
+
+                            let attrVal = parent[propertyName].serialize();
+
+                            if(attrVal!== undefined){
+                                _appendKeyValue(key,attrVal);
+                                if(parent===undefined){
+                                    _removeTailComma();
+                                }
+                            }
+                        }
+                        
+                    }
+                    break;
+                case 'object':
+                    //对象的情况:
+                    //对象非null
+                    if(target!==null){
+                        //对于日期类型
+                        if(target.constructor === Date){
+                            resultBuffer.push(JSON.stringify(target));
+                        }else if(target.constructor===Array &&parent===undefined  ){ // 如果有parent，则只有存取器、简单类型才可以参与序列化，复杂类型全部要走存取器来定义
+
+                            resultBuffer.push('[');
+                            //如果字段是数组，则分别进行序列化
+                            for(var index=0;index<target.length;index++){
+                                _serializeData(undefined,target[index],undefined);
+                                resultBuffer.push(',');
+                            }
+                            _removeTailComma();
+                            resultBuffer.push(']');
+                        }
+                        else{
+                            //如果是其他对象类型
+                            //如果没有持有对象，则看类型本身是否允许序列化()。如果有持有对象，则需要序列化的字段不应该是object，二应该是存取器function
+                            if( target.constructor.__ud_serializable__&&parent===undefined ){
+                                //检查是否有自定义的序列化方法
+                                if(target.constructor.prototype.hasOwnProperty('serialize')){
+                                    let temp = JSON.parse(target.serialize());
+                                    temp.__ud_class_name__ = Types.typeof(target).name;
+                                    _appendKeyValue(key,JSON.stringify(temp));
+                                    if(parent===undefined){
+                                        _removeTailComma();
+                                    }
+                                }else{
+                                    resultBuffer.push('{');
+                                    //如果没有该方法，则尝试自动序列化。
+                                    //遍历其中的每个字段，对其进行序列化
+                                    for(var fieldName in target){
+                                        let fieldOfTarget = target[fieldName];
+                                        _serializeData(fieldName,fieldOfTarget,target);
+                                    }
+                                    _appendKeyValue('__ud_class_name__',`"${Types.typeof(target).name}"`);
+                                    _removeTailComma();
+                                    resultBuffer.push('}');
+                                }
+                            }else{
+                                console.log('no need to serialize')
+                            }
+                        }
+
+
+                    }else{
+                        //对象是null
+                        _appendKeyValue(key,'null')
+                        if(parent===undefined){
+                            _removeTailComma();
+                        }
+                        // resultBuffer.push('null');
+                    }
+                    break;
+            }
+        }catch(e){
+            console.log(`_serializeData target:[${JSON.stringify(target)}] type:[${t}] error,${e}`)
         }
     }
 
@@ -626,12 +639,22 @@ var deserialize = function(serializedString){
                     let customType = data.__ud_class_name__;
                     if(customType){
                         // 如果有，则创建自定义类型对象，然后遍历对象的field访问器，一个个去赋值
-                        let obj = createClassObject(customType);
+                        // let obj = createClassObject(customType);
+                        let obj = createClassObject(customType,data);
 
                         delete data['__ud_class_name__']; // 删掉省得呆会影响属性的遍历
                         for(var filedName in data){
-                            let filedObject = _deserializeData(data[filedName].value); //TODO:如果以后Attribute的序列化优化掉了value选项，则这里的value也需要删除
-                            obj[filedName] && obj[filedName]({value:filedObject})
+
+                            console.log(`deserialize:[${filedName}] `)
+                            if(typeof obj[filedName] === 'function'){
+                                let filedObject = _deserializeData(data[filedName].value); //TODO:如果以后Attribute的序列化优化掉了value选项，则这里的value也需要删除
+                                // obj[filedName] && obj[filedName]({value:filedObject})
+                                obj[filedName]({value:filedObject});//如果是属性访问器，则初始化值
+                            }else{
+                                let filedObject = _deserializeData(data[filedName]); 
+                                //否则有可能是自定义枚举
+                                obj[filedName] = filedObject;
+                            }
                         }
                         return obj;
 

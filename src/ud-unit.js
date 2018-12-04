@@ -9,10 +9,10 @@ import {regEnums,regClass,createClassObject,Types} from "./ud-runtime"
  */
 let UDAttributeUnit=regEnums('UDAttributeUnit',(iota)=>{
 return {
-        PX:iota(),
-        PERCENTAGE:iota(),
-        ANGLE:iota(),
-        NONE:iota(),
+        PX:1,
+        PERCENTAGE:2,
+        ANGLE:3,
+        NONE:4,
     }
 });
 

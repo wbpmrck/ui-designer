@@ -9,12 +9,12 @@ import {regEnums,regClass,createClassObject,Types} from "../ud-runtime"
  */
 let UDCompareOperatorEnum=regEnums('UDCompareOperatorEnum',(iota)=>{
 return {
-        GT:iota(), // 大于
-        GTE:iota(), // 大于等于
-        LE:iota(), // 小于
-        LTE:iota(), // 小于等于
-        E:iota(), // 等于
-        NE:iota(), // 不等于
+        GT:1, // 大于
+        GTE:2, // 大于等于
+        LE:3, // 小于
+        LTE:4, // 小于等于
+        E:5, // 等于
+        NE:6, // 不等于
     }
 });
 
@@ -24,10 +24,10 @@ return {
  */
 let UDArithmeticOperatorEnum=regEnums('UDArithmeticOperatorEnum',(iota)=>{
     return {
-            ADD:iota(), // 加法
-            SUB:iota(), // 减法
-            MUL:iota(), // 乘法
-            DIV:iota(), // 除法
+            ADD:1, // 加法
+            SUB:2, // 减法
+            MUL:3, // 乘法
+            DIV:4, // 除法
         }
     });
 
@@ -36,8 +36,8 @@ let UDArithmeticOperatorEnum=regEnums('UDArithmeticOperatorEnum',(iota)=>{
  */
 let UDLogicOperatorEnum=regEnums('UDLogicOperatorEnum',(iota)=>{
     return {
-            AND:iota(), // 与
-            OR:iota(), // 或
+            AND:1, // 与
+            OR:2, // 或
         }
     });
 
@@ -46,8 +46,8 @@ let UDLogicOperatorEnum=regEnums('UDLogicOperatorEnum',(iota)=>{
  */
 let UDRelationOperatorEnum=regEnums('UDRelationOperatorEnum',(iota)=>{
     return {
-            CONTAIN:iota(), // 包含
-            NOT_CONTAIN:iota(), // 不包含
+            CONTAIN:1, // 包含
+            NOT_CONTAIN:2, // 不包含
         }
     });
 

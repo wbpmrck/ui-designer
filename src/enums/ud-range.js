@@ -9,8 +9,8 @@ import {regEnums,regClass,createClassObject,Types} from "../ud-runtime"
  */
 let UDRange=regEnums('UDRange',(iota)=>{
 return {
-        APP:iota(), //影响整个app
-        LAYER:iota(), //仅影响当前层级
+        APP:1, //影响整个app
+        LAYER:2, //仅影响当前层级
     }
 });
 

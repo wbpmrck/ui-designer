@@ -3,6 +3,7 @@ import {regEnums,regClass,createClassObject,Types,Type,DECORATORS,field,UDAttrib
 import UDEvent from "./ud-event"
 import UDAction from "./ud-action"
 import UDTouch from "./gesture/ud-touch"
+import UDEventHandler from "./ud-event-handler"
 
 
 @DECORATORS.serializable(true)
@@ -50,6 +51,12 @@ class UDObject {
     @DECORATORS.serializable(true)
     @DECORATORS.field({type:String.getType(),desc:'允许外部指定的唯一标识',value:''})
     id(){};//允许外部指定的唯一标识
+
+
+    @DECORATORS.serializable(true)
+    @DECORATORS.field({type:Types.ARRAY(UDEventHandler.getType()),desc:'对象上挂载的事件处理逻辑',value:[]})
+    eventHandlers(){};//允许外部指定的唯一标识
+
 
     parent; //节点的父亲节点
 

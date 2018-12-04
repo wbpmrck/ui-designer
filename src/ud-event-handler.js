@@ -31,10 +31,11 @@ class UDEventHandler{
 
     
 
-    constructor({eventName,expression,actions}) {
+    constructor({eventName,expression,actions,eventFrom}) {
         this.eventName({value:eventName});
         this.expression({value:expression});
         this.actions({value:actions});
+        this.eventFrom = eventFrom;
     }
 }
 regClass(className,UDEventHandler)
