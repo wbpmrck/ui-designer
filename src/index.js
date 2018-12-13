@@ -12,6 +12,7 @@ import UDAttributeVisitOperator  from "./logic/ud-attribute-visit-operator"
 import UDCompareOperator  from "./logic/ud-compare-operator"
 import UDLogicOperator  from "./logic/ud-logic-operator"
 import UDRelationOperator  from "./logic/ud-relation-operator"
+import UDRange from "./enums/ud-range"
 import {
     UDCompareOperatorEnum,  
     UDArithmeticOperatorEnum,  
@@ -19,7 +20,7 @@ import {
     UDRelationOperatorEnum,  
 }   from "./enums/ud-operator-enum"
 // import {UDAttribute}  from "./ud-attribute"
-import {UDAttributeUnit}  from "./ud-unit"
+import {UDAttributeUnit}  from "./enums/ud-unit"
 import  {regClass,createClassObject,serialize,deserialize} from "./ud-runtime"
 import  UDTouch from "./gesture/ud-touch"
 import  UDTouchEventContext from "./gesture/ud-touch-event-context"
@@ -40,6 +41,7 @@ export  {
     createClassObject,
     regClass,
     UDObjec,
+    UDRange,
     UDContainer,
     UDUIObject,
     UDEvent,

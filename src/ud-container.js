@@ -86,7 +86,7 @@ class UDContainer extends UDObject{
         let index = -1;
 
         for(let i=0;i<this.children().value.length;i++){
-            if(this.children().value[i]._identity().value === child._identity){
+            if(this.children().value[i]._id().value === child._id){
                 index =  i;
                 break;
             }

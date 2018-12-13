@@ -1,6 +1,6 @@
 import UDObject from './ud-object'
 import UDEvent from './ud-event'
-import {UDAttributeUnit}  from "./ud-unit"
+import {UDAttributeUnit}  from "./enums/ud-unit"
 import UDTouchEventContext from "./gesture/ud-touch-event-context"
 import UDTouch from "./gesture/ud-touch"
 import UDRange from "./enums/ud-range"
@@ -59,12 +59,6 @@ class UDUIObject extends UDObject{
             ]})
         ]);
     }
-    
-
-    @DECORATORS.serializable(true)
-    @DECORATORS.field({type:Types.ARRAY('UDObject'),desc:'节点的孩子',value:[]})
-    children(){};  //节点的孩子
-    
     @DECORATORS.serializable(true)
     @DECORATORS.field({type:Number.getType(),desc:'x坐标',value:0,unit:UDAttributeUnit.PX})
     x(){};

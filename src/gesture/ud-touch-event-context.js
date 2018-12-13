@@ -1,6 +1,6 @@
 import {regEnums,regClass,createClassObject,Types,DECORATORS,field} from "../ud-runtime"
 
-import {UDAttributeUnit}  from "../ud-unit"
+import {UDAttributeUnit}  from "../enums/ud-unit"
 import UDTouch from "./ud-touch"
 
 const className = 'UDTouchEventContext'

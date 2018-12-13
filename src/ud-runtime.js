@@ -195,7 +195,7 @@ const DECORATORS={
                 // descriptor.enumerable = false;//不可被枚举遍历，从而提高序列化性能(如果存取器一直没被调用过，那么说明这个值肯定保持的是原始值，那么压根也没必要序列化，TODO:如果想要无视序列化的效能，则可以注释这一行)
                 descriptor.enumerable = true;//序列化的时候，只可以序列化访问器
                 descriptor.value = function(option){
-                    console.log(`field [call]: key=${key}`)
+                    // console.log(`field [call]: key=${key}`)
                     //当存取器执行的时候，先初始化参数
                     if(this[propertyName] === undefined){
                         console.log(`初始化存取器: key=${key}`)
@@ -248,7 +248,8 @@ class Type{
         this.name = name;
     }
     serialize(){
-        return this.name;
+        // return this.name;
+        return JSON.stringify({name:this.name});
     }
     createInstance(...params){
 
@@ -485,7 +486,7 @@ var serialize = function(targetObject,callCount){
      */
     let _serializeData = function(key,target,parent,targetTypeDeclared){
 
-        console.log(`serialize:[${key}] `)
+        console.log(`serialize:[${key}]  `)
         let t = typeof target;
 
         try{
@@ -545,6 +546,7 @@ var serialize = function(targetObject,callCount){
                             resultBuffer.push('[');
                             //如果字段是数组，则分别进行序列化
                             for(var index=0;index<target.length;index++){
+                                console.log(`prepare serialize [${index}] in ${key}`)
                                 _serializeData(undefined,target[index],undefined);
                                 resultBuffer.push(',');
                             }
@@ -554,10 +556,15 @@ var serialize = function(targetObject,callCount){
                         else{
                             //如果是其他对象类型
                             //如果没有持有对象，则看类型本身是否允许序列化()。如果有持有对象，则需要序列化的字段不应该是object，二应该是存取器function
+                            console.log(`target.constructor.name=${target.constructor.name}`)
+                            console.log(`target.constructor.__ud_serializable__=${target.constructor.__ud_serializable__}`)
                             if( target.constructor.__ud_serializable__&&parent===undefined ){
                                 //检查是否有自定义的序列化方法
                                 if(target.constructor.prototype.hasOwnProperty('serialize')){
-                                    let temp = JSON.parse(target.serialize());
+                                    console.log(`call target.serialize `)
+                                    let targetString = target.serialize();
+                                    console.log(`targetString =${targetString} `)
+                                    let temp = JSON.parse(targetString);
                                     temp.__ud_class_name__ = Types.typeof(target).name;
                                     _appendKeyValue(key,JSON.stringify(temp));
                                     if(parent===undefined){
@@ -630,6 +637,7 @@ var deserialize = function(serializedString){
                 if(data.constructor === Array){
                     let arr =[];
                     for(var i=0;i<data.length;i++){
+                        console.log(`prepare deserialize [${i}] in data`)
                         let obj = _deserializeData(data[i])
                         arr.push(obj)
                     }
@@ -640,17 +648,21 @@ var deserialize = function(serializedString){
                     if(customType){
                         // 如果有，则创建自定义类型对象，然后遍历对象的field访问器，一个个去赋值
                         // let obj = createClassObject(customType);
+                            console.log(`createClassObject:[${customType}] `)
                         let obj = createClassObject(customType,data);
+                        console.log(`obj:[${obj}] `)
 
                         delete data['__ud_class_name__']; // 删掉省得呆会影响属性的遍历
                         for(var filedName in data){
 
                             console.log(`deserialize:[${filedName}] `)
                             if(typeof obj[filedName] === 'function'){
+                                console.log(`deserialize:[${filedName}] function `)
                                 let filedObject = _deserializeData(data[filedName].value); //TODO:如果以后Attribute的序列化优化掉了value选项，则这里的value也需要删除
                                 // obj[filedName] && obj[filedName]({value:filedObject})
                                 obj[filedName]({value:filedObject});//如果是属性访问器，则初始化值
                             }else{
+                                console.log(`deserialize:[${filedName}] object `)
                                 let filedObject = _deserializeData(data[filedName]); 
                                 //否则有可能是自定义枚举
                                 obj[filedName] = filedObject;
@@ -679,8 +691,12 @@ var deserialize = function(serializedString){
 /**
  * 表示一个属性值
  */
+@DECORATORS.serializable(true)
 class UDAttribute{
 
+    static getTypeName(){
+        return 'UDAttribute'
+    }
     /**
      * 这里面的T应该都是简单类型，不要用属性去尝试保存一个对象
      */
@@ -758,7 +774,8 @@ class UDAttribute{
                 result.push(`"value":${serialize(this.value)}`);
             }
             if(this.defaultValueType!==this.valueType){
-                result.push(`"valueType":${JSON.stringify(this.valueType)}`);
+                // result.push(`"valueType":${JSON.stringify(this.valueType)}`);
+                result.push(`"valueType":${serialize(this.valueType)}`);
             }
             if(this.defaultUnit!==this.unit){
                 result.push(`"unit":${JSON.stringify(this.unit)}`);
@@ -794,4 +811,5 @@ class UDAttribute{
 
 }
 
+regClass('UDAttribute',UDAttribute)
 export {regClass,regEnums,createClassObject,Types,Type,isInstanceOf,DECORATORS,field,serialize,deserialize,UDAttribute}

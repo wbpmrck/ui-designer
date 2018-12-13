@@ -13,11 +13,11 @@
 
 **TODO**
 - 完成Action类型设计[ok]
-- 完成EventHandler类型设计 [ing]
+- 完成EventHandler类型设计 [ok]
     - 定义operator,expression等类型。完善其内部实现
 - 完成runtime里的序列化、反序列化方法实现
     - 序列化 [ok]
-    - 反序列化 [ing]
+    - 反序列化 [ok]
         - 解决Object,UIObject,以及对应EventHandler信息的序列化、反序列化问题
         - 2
 - 测试用例

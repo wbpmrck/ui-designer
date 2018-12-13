@@ -45,6 +45,12 @@ class UDUIContainer extends UDUIObject{
             ]}),
         ]);
     }
+    
+
+    @DECORATORS.serializable(true)
+    @DECORATORS.field({type:Types.ARRAY('UDObject'),desc:'节点的孩子',value:[]})
+    children(){};  //节点的孩子
+    
 
     // constructor({typeName,serializedString}) {
     // constructor({serializedString}) {
@@ -86,7 +92,7 @@ class UDUIContainer extends UDUIObject{
         let index = -1;
 
         for(let i=0;i<this.children().value.length;i++){
-            if(this.children().value[i]._identity().value === child._identity){
+            if(this.children().value[i]._id().value === child._id){
                 index =  i;
                 break;
             }

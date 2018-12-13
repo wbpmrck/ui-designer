@@ -36,7 +36,6 @@ class UDObject {
                 new UDAttribute({name:'attributesArray',desc:'要设置的属性列表',valueType:Types.ARRAY(UDAttribute.getType())})
             ]}),
             new UDAction({name:'delete',desc:'删除对象',params:[
-                new UDAttribute({name:'objectId',desc:'对象标识',valueType:Types.UDObjectID})
             ]})
         ];
     }
@@ -44,13 +43,13 @@ class UDObject {
 
     @DECORATORS.serializable(true)
     @DECORATORS.field({type:String.getType(),desc:'自动化生成的唯一标识',value:''})
-    // _identity; //自动化生成的唯一标识
-    _identity(){}; //自动化生成的唯一标识
+    // _id; //自动化生成的唯一标识
+    _id(){}; //自动化生成的唯一标识
 
 
     @DECORATORS.serializable(true)
-    @DECORATORS.field({type:String.getType(),desc:'允许外部指定的唯一标识',value:''})
-    id(){};//允许外部指定的唯一标识
+    @DECORATORS.field({type:String.getType(),desc:'允许外部指定的名称',value:''})
+    name(){};//允许外部指定的唯一标识
 
 
     @DECORATORS.serializable(true)
@@ -70,10 +69,11 @@ class UDObject {
         //     this.deserialize(serializedString)
         // }else{
             // this.typeName = typeName;
-            this._identity({value:`${+new Date()}-${UDObject.identitySeed++}`});
+            this._id({value:`${+new Date()}-${UDObject.identitySeed++}`});
             this.parent = undefined;
         // }
     }
+
 
     /**
      * 判断该对象能否添加目标类型的实例为自己的孩子
