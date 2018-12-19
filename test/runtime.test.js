@@ -111,7 +111,7 @@ describe('runtime', () => {
         expect(des_div1.__ud_attribute_x__.defaultValueType).to.equal(div1.__ud_attribute_x__.defaultValueType);
         expect(des_div1.__ud_attribute_x__.valueType).to.equal(div1.__ud_attribute_x__.valueType);
         expect(des_div1.__ud_attribute_x__.defaultUnit).to.equal(div1.__ud_attribute_x__.defaultUnit);
-
+ 
         expect(des_div1.y().value).to.equal(div1.y().value);
         expect(des_div1.y().desc).to.equal(div1.y().desc);
         expect(des_div1.y().unit).to.equal(div1.y().unit);

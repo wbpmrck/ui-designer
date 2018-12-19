@@ -1,11 +1,11 @@
-import UDObject from './ud-object'
-import UDEvent from './ud-event'
-import {UDAttributeUnit}  from "./enums/ud-unit"
-import UDTouchEventContext from "./gesture/ud-touch-event-context"
-import UDTouch from "./gesture/ud-touch"
-import UDRange from "./enums/ud-range"
-import UDAction from "./ud-action"
-import {regEnums,regClass,createClassObject,Types,DECORATORS,field,UDAttribute} from "./ud-runtime"
+import UDObject from '../ud-object'
+import UDEvent from '../ud-event'
+import {UDAttributeUnit}  from "../enums/ud-unit"
+import UDTouchEventContext from "../gesture/ud-touch-event-context"
+import UDTouch from "../gesture/ud-touch"
+import UDRange from "../enums/ud-range"
+import UDAction from "../ud-action"
+import {regEnums,regClass,createClassObject,Types,DECORATORS,field,UDAttribute} from "../ud-runtime"
 
 const className = 'UDUIObject'
 /**
@@ -59,6 +59,10 @@ class UDUIObject extends UDObject{
             ]})
         ]);
     }
+
+    /*
+        1.位置相关
+    */
     @DECORATORS.serializable(true)
     @DECORATORS.field({type:Number.getType(),desc:'x坐标',value:0,unit:UDAttributeUnit.PX})
     x(){};
@@ -78,6 +82,59 @@ class UDUIObject extends UDObject{
     @DECORATORS.serializable(true)
     @DECORATORS.field({type:Number.getType(),desc:'高度',value:0,unit:UDAttributeUnit.PX})
     h(){};
+
+
+
+    /*
+        2.背景和透明度
+    */
+
+    @DECORATORS.serializable(true)
+    @DECORATORS.field({type:Number.getType(),desc:'不透明度',value:100,unit:UDAttributeUnit.PERCENTAGE})
+    alpha(){};
+
+    @DECORATORS.serializable(true)
+    @DECORATORS.field({type:String.getType(),desc:'背景色',value:''})
+    bgColor(){};
+
+
+
+    /*
+        3.3D旋转和变换
+    */
+
+   @DECORATORS.serializable(true)
+   @DECORATORS.field({type:Number.getType(),desc:'沿水平轴旋转角度',value:0,unit:UDAttributeUnit.ANGLE})
+   rotateX(){};
+
+   @DECORATORS.serializable(true)
+   @DECORATORS.field({type:Number.getType(),desc:'沿垂直轴旋转角度',value:0,unit:UDAttributeUnit.ANGLE})
+   rotateY(){};
+
+   @DECORATORS.serializable(true)
+   @DECORATORS.field({type:Number.getType(),desc:'沿垂z轴旋转角度',value:0,unit:UDAttributeUnit.ANGLE})
+   rotateZ(){};
+
+
+
+
+    /*
+        4.边框和阴影
+    */
+
+   @DECORATORS.serializable(true)
+   @DECORATORS.field({type:Number.getType(),desc:'边框圆角',value:0,unit:UDAttributeUnit.PX})
+   borderRadius(){};
+
+   @DECORATORS.serializable(true)
+   @DECORATORS.field({type:Number.getType(),desc:'边框宽度',value:0,unit:UDAttributeUnit.PX})
+   borderWidth(){};
+
+   @DECORATORS.serializable(true)
+   @DECORATORS.field({type:String.getType(),desc:'边框颜色',value:''})
+   borderColor(){};
+
+
     // constructor({typeName,serializedString}) {
     constructor() {
         super();

@@ -1,8 +1,8 @@
 
 import UDObjec  from "./ud-object"
-import UDUIObject  from "./ud-ui-object"
-import UDContainer  from "./ud-container"
-import UDUIContainer  from "./ud-ui-container"
+import UDUIObject  from "./ui/ud-ui-object"
+import UDContainer  from "./container/ud-container"
+import UDUIContainer  from "./container/ud-ui-container"
 import UDEvent  from "./ud-event"
 import UDEventHandler  from "./ud-event-handler"
 import UDAction  from "./ud-action"

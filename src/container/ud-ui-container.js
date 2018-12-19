@@ -1,20 +1,21 @@
-import UDObject from './ud-object'
-import UDUIObject from './ud-ui-object'
-import UDEvent from './ud-event'
-import UDAction from './ud-action'
-import {regEnums,regClass,createClassObject,Types,DECORATORS,field,UDAttribute} from "./ud-runtime"
+import UDUIObject from '../ui/ud-ui-object'
+import UDEvent from '../ud-event'
+import UDObject from "../ud-object"
+import UDAction from "../ud-action"
+import {regEnums,regClass,createClassObject,Types,DECORATORS,field,UDAttribute} from "../ud-runtime"
 
-const className = 'UDContainer'
+const className = 'UDUIContainer'
 /**
  * 表示可以被展示和显示的界面元素的容器
  * 注：UIContainer本身也是参与布局和渲染的
  */
-class UDContainer extends UDObject{
+
+@DECORATORS.serializable(true)
+class UDUIContainer extends UDUIObject{
     
     static getTypeName(){
         return className
     }
-
     /**
      * 获取该类支持的事件类型。
      * 
@@ -44,15 +45,20 @@ class UDContainer extends UDObject{
             ]}),
         ]);
     }
-
+    
 
     @DECORATORS.serializable(true)
     @DECORATORS.field({type:Types.ARRAY('UDObject'),desc:'节点的孩子',value:[]})
     children(){};  //节点的孩子
+    
 
+    // constructor({typeName,serializedString}) {
+    // constructor({serializedString}) {
     constructor() {
         super()
+        // super({serializedString})
     }
+
     /**
      * 判断该对象能否添加目标类型的实例为自己的孩子
      * @param {TypeName} targetType 
@@ -115,6 +121,6 @@ class UDContainer extends UDObject{
         }
     }
 }
-regClass(className,UDContainer)
+regClass(className,UDUIContainer)
 
-export default UDContainer;
+export default UDUIContainer;
