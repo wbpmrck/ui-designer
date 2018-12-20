@@ -3,6 +3,7 @@ import UDObjec  from "./ud-object"
 import UDUIObject  from "./ui/ud-ui-object"
 import UDContainer  from "./container/ud-container"
 import UDUIContainer  from "./container/ud-ui-container"
+import UDStage  from "./container/ud-stage"
 import UDEvent  from "./ud-event"
 import UDEventHandler  from "./ud-event-handler"
 import UDAction  from "./ud-action"
@@ -26,6 +27,7 @@ import  UDTouch from "./gesture/ud-touch"
 import  UDTouchEventContext from "./gesture/ud-touch-event-context"
 
 export  {
+    UDStage,  
     UDCompareOperatorEnum,  
     UDArithmeticOperatorEnum,  
     UDLogicOperatorEnum,  
