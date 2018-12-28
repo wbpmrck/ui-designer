@@ -17,7 +17,9 @@ class UDAction{
     @DECORATORS.field({type:String.getType(),desc:'行为名称',value:''})
     name(){}; //行为名称,在发生行为的对象内，该名称应该是唯一的
 
-    desc; //行为描述
+    @DECORATORS.serializable(true)
+    @DECORATORS.field({type:String.getType(),desc:'行为描述',value:''})
+    desc(){}; //行为描述
 
     @DECORATORS.serializable(true)
     @DECORATORS.field({type:Types.ARRAY(UDAttribute.getType()),desc:'行为接收的参数',value:[]})
@@ -27,7 +29,8 @@ class UDAction{
     constructor({name,desc,params,objectId}) {
         this.name({value:name});
         this.objectId({value:objectId});
-        this.desc = desc;
+        // this.desc = desc;
+        this.desc({value:desc});
         this.params({value:params});
         // this.name = name;
         // this.params = params;

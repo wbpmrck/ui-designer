@@ -200,7 +200,8 @@ const DECORATORS={
                     if(this[propertyName] === undefined){
                         console.log(`初始化存取器: key=${key}`)
                         Object.defineProperty(this, propertyName, {
-                            enumerable: false,
+                            // enumerable: false,
+                            enumerable: true,
                             configurable: false,
                             writable: false,
                             // value: new UDAttribute({name:key,desc,value,valueType:valueType,unit,defaultValue:value,defaultValueType:type,defaultUnit:unit})
@@ -491,9 +492,7 @@ var serialize = function(targetObject,callCount){
 
         try{
             switch(t){
-            // switch(Types.typeof(target)){
                 case 'string':
-                console.log()
                     _appendKeyValue(key,`"${target.toString()}"`)
                     if(parent===undefined){
                         _removeTailComma();
@@ -575,8 +574,12 @@ var serialize = function(targetObject,callCount){
                                     //如果没有该方法，则尝试自动序列化。
                                     //遍历其中的每个字段，对其进行序列化
                                     for(var fieldName in target){
-                                        let fieldOfTarget = target[fieldName];
-                                        _serializeData(fieldName,fieldOfTarget,target);
+                                        console.log(`target.fieldName=${fieldName}`)
+                                        console.log(`fieldName.indexOf('__ud_attribute')=${fieldName.indexOf('__ud_attribute')}`)
+                                        if(fieldName.indexOf('__ud_attribute')<0){
+                                            let fieldOfTarget = target[fieldName];
+                                            _serializeData(fieldName,fieldOfTarget,target);
+                                        }
                                     }
                                     _appendKeyValue('__ud_class_name__',`"${Types.typeof(target).name}"`);
                                     _removeTailComma();
