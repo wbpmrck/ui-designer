@@ -202,8 +202,10 @@ const DECORATORS={
                         Object.defineProperty(this, propertyName, {
                             // enumerable: false,
                             enumerable: true,
-                            configurable: false,
-                            writable: false,
+                            // configurable: false,
+                            configurable: true,
+                            // writable: false,
+                            writable: true, //FIXME:为了使得在admin中可以被vue跟踪，改为可写
                             // value: new UDAttribute({name:key,desc,value,valueType:valueType,unit,defaultValue:value,defaultValueType:type,defaultUnit:unit})
                             value: new UDAttribute({name:key,desc,value,valueType:type,unit,defaultValue:value,defaultValueType:type,defaultUnit:unit})
                         });

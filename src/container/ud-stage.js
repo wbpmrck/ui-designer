@@ -1,4 +1,5 @@
 import UDContainer from './ud-container'
+import UDEvent from '../ud-event'
 import {regEnums,regClass,createClassObject,Types,DECORATORS,field,UDAttribute} from "../ud-runtime"
 import {UDAttributeUnit} from '../enums/ud-unit'
 
