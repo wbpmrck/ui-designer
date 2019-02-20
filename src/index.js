@@ -2,6 +2,7 @@
 import UDObjec  from "./ud-object"
 import UDUIObject  from "./ui/ud-ui-object"
 import UDRectangle  from "./ui/ud-rectangle"
+import UDImage  from "./ui/ud-image"
 import UDContainer  from "./container/ud-container"
 import UDUIContainer  from "./container/ud-ui-container"
 import UDStage  from "./container/ud-stage"
@@ -30,6 +31,7 @@ import  UDTouchEventContext from "./gesture/ud-touch-event-context"
 export  {
     UDStage,  
     UDRectangle,  
+    UDImage,  
     UDCompareOperatorEnum,  
     UDArithmeticOperatorEnum,  
     UDLogicOperatorEnum,  

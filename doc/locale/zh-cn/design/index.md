@@ -6,6 +6,7 @@
 设计想法汇总罗列出来，以供使用者参考
 
 - [舞台、对象树设计](./ref/object-tree.md)
+- [工具箱设计](./ref/tool-box.md)
 - [时间轴设计](./ref/time-axis.md)
 - [事件机制](./ref/event.md)
 - [求值器](./ref/evaluator.md)
