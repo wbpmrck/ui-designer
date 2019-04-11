@@ -216,8 +216,10 @@ const DECORATORS={
                     if(option === undefined){
                         return {
                             value:this[propertyName].value,
+                            defaultValue:this[propertyName].defaultValue,
                             desc:this[propertyName].desc,
-                            unit:this[propertyName].unit
+                            unit:this[propertyName].unit,
+                            defaultUnit:this[propertyName].defaultUnit,
                         }
                     }else if(typeof option ==='object'){
                         //设置值

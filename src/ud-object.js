@@ -71,7 +71,18 @@ class UDObject {
             // this.typeName = typeName;
             this._id({value:`${+new Date()}-${UDObject.identitySeed++}`});
             this.parent = undefined;
+            this.initAllProps();
         // }
+    }
+
+    initAllProps(){
+        for(var p in this){
+            // console.log(`init check prop:${p}=${this[p].__ud_attribute__}`)
+            if(this[p] && this[p].__ud_attribute__){
+                console.log(`init prop:${p}`)
+                this[p]();
+            }
+        }
     }
 
 
