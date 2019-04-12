@@ -112,7 +112,7 @@ class UDUIObject extends UDObject{
    rotateY(){};
 
    @DECORATORS.serializable(true)
-   @DECORATORS.field({type:Number.getType(),desc:'沿垂z轴旋转角度',value:0,unit:UDAttributeUnit.ANGLE})
+   @DECORATORS.field({type:Number.getType(),desc:'沿z轴旋转角度',value:0,unit:UDAttributeUnit.ANGLE})
    rotateZ(){};
 
 
