@@ -49,6 +49,8 @@ var regEnums = function(name ,keyValuePairGenerator){
                     }
                 }
             }
+            //add 2019年04月16日：增加一个获取所有枚举类型定义的集合，方便编辑器处理
+            _enumCons.__ud_all_enums__ =[];
             //自动创建枚举类的每个枚举值(对象)
             for(var key in keyValuePairObject){
                 _enumCons[key]= new _enumCons({});
@@ -74,6 +76,8 @@ var regEnums = function(name ,keyValuePairGenerator){
                 _enumCons[key].key= key;
                 _enumCons[key].val= keyValuePairObject[key];
 
+                //add 2019年04月16日：增加一个获取所有枚举类型定义的集合，方便编辑器处理
+                _enumCons.__ud_all_enums__.push(_enumCons[key]);
             }
 
 
@@ -214,13 +218,15 @@ const DECORATORS={
                     }
                     //取值
                     if(option === undefined){
-                        return {
-                            value:this[propertyName].value,
-                            defaultValue:this[propertyName].defaultValue,
-                            desc:this[propertyName].desc,
-                            unit:this[propertyName].unit,
-                            defaultUnit:this[propertyName].defaultUnit,
-                        }
+                       
+                        return this[propertyName]; // 2019年04月16日 改为直接返回内部属性对象
+                        // return {
+                        //     value:this[propertyName].value,
+                        //     defaultValue:this[propertyName].defaultValue,
+                        //     desc:this[propertyName].desc,
+                        //     unit:this[propertyName].unit,
+                        //     defaultUnit:this[propertyName].defaultUnit,
+                        // }
                     }else if(typeof option ==='object'){
                         //设置值
                         if(option.value !== undefined){

@@ -33,6 +33,13 @@ describe('runtime', () => {
     afterEach(() => {
     });
 
+    it('can use Enum type ', () => {
+       
+        expect(UDRange.APP).not.to.equal(UDRange.LAYER); 
+        expect(UDRange.name).to.equal('UDRange'); 
+        expect(UDRange.parse(2)).to.equal(UDRange.LAYER); //parse can translate a enum value to a enum type
+    });
+
     it('can serialize object and deserialize them', () => {
 
         let text1 = new UDUIObject();
