@@ -7,6 +7,7 @@
 
 - [舞台、对象树设计](./ref/object-tree.md)
 - [工具箱设计](./ref/tool-box.md)
+- [可视化编辑器设计](./ref/visual-design-tool.md)
 - [时间轴设计](./ref/time-axis.md)
 - [事件机制](./ref/event.md)
 - [求值器](./ref/evaluator.md)
