@@ -113,7 +113,9 @@ No content
     - [`已完成`]UDInput 组件代理编写
     - [`已完成`]UDMultiInput 组件代理编写
     - [`进行中`]*UDLayoutRow 布局对象开发
-    - [`进行中`]UDLayoutCol 布局对象开发
+    - [`进行中`]*UDLayoutCol 布局对象开发
+    - [`进行中`]*可视化编辑区域代码重构，充分考虑类型的复用，拖拽行为控制等，采用继承方式开发每个Agent组件
+      - [`进行中`]* 使用vue的extend特性，重构整个VisualCanvas区域的组件，按照继承关系分层编写
   
 - 事件面板开发 & 组件事件完善
   - 事件面板编辑器开发
@@ -191,6 +193,17 @@ No content
 使用的图片->html的技术，可参考:
 - [这篇文章](https://blog.insightdatascience.com/automated-front-end-development-using-deep-learning-3169dd086e82)
 - [sketch-code项目](https://github.com/ashnkumar/sketch-code)
+
+
+
+## V0.3.4 制作平台开发模板市场，持续运营
+
+开放模板市场，用户可以上传自己的模板给别人使用，别人使用之后可以给模板开发者带来虚拟奖励，可以用于抵扣使用费用（鼓励设计人员共享自己的模板）。
+
+- 不同的用户等级，可以免费发布到市场的模板数量不同。等级越高，就可以把越多的模板发布到市场赚取奖励金
+- h5发布之后，按照访问次数和流量收费。
+- 丰富完善管理面板功能，支持访问统计、流量统计、用户行为分析等功能
+
 
 ## V0.4 小程序端引擎设计和开发
 
